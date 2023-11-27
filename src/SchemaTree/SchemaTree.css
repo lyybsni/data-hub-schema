@@ -1,0 +1,52 @@
+
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    margin: 15%;
+    background: azure;
+}
+
+.MuiInput-root {
+    margin: 0 25px 0;
+}
+
+.MuiTreeItem-label {
+    text-align: left;
+    height: 25px;
+}
+
+.tree-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#trees {
+    display: flex;
+    flex-direction: row;
+    margin: 24px;
+}
+
+#button-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 10px 25% 10px;
+}
+
+.modal-input-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10px 25px 10px;
+}
+
+.tree-node-label {
+    display: inline-flex;
+}
+
+.tree-view {
+    width: 50%;
+    height: 100%;
+    margin: 10px 0 10px;
+}
