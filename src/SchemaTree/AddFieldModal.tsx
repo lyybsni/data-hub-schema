@@ -2,7 +2,6 @@ import {Button, Input, Modal} from "@mui/material";
 import React from "react";
 
 import './SchemaTree.css';
-import {Label} from "@mui/icons-material";
 
 const AddFieldModal = (props: {
     open: boolean,
