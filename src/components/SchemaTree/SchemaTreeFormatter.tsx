@@ -1,5 +1,3 @@
-import {TreeNode} from "./SchemaTree";
-
 const schemaTreeMappingToJson = (nodes: any[]) => {
     const result = {} as any;
 

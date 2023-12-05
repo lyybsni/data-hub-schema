@@ -1,27 +1,37 @@
-import SchemaTreeComponent, {TreeNode} from "./SchemaTree";
-import {ApplicantSchema} from "../resource/ApplicantSchema";
-import React, {useState} from "react";
-import {Button, Input, InputLabel} from "@mui/material";
-import {schemaTreeMappingToJson} from "./SchemaTreeFormatter";
+import SchemaTreeComponent, {TreeNode} from "../../components/SchemaTree/SchemaTree";
+import {ApplicantSchema} from "../../resource/ApplicantSchema";
+import React, {useEffect, useState} from "react";
+import {Button, Input, InputLabel, MenuItem, Select} from "@mui/material";
+import {schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
+import {saveFile} from "../../utils/File"
+import {getSchemaList} from "./Schema";
 
 const SchemaTreePage = () => {
 
     const [treeData, setTreeData] = React.useState([] as TreeNode[]);
     const [exportData, setExportData] = React.useState([] as any[]);
-
-    const saveFile = async (blob: Blob, fileName: string) => {
-        const a = document.createElement('a');
-        a.download = fileName;
-        a.href = URL.createObjectURL(blob);
-        a.addEventListener('click', () => {
-            setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
-        });
-        a.click();
-    };
+    const [schemaList, setSchemaList] = React.useState([] as any[]);
+    const [selectedSchema, setSelectedSchema] = React.useState('');
 
     const [files, setFiles] = useState("");
 
-    const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const getSelection = () => {
+        const list = getSchemaList();
+        list.then((res) => {
+            return res.map((item) => {
+                const schema = JSON.parse(item.schema);
+                return (<MenuItem value={item.id} key={item.id}>
+                    {Object.keys(schema)[0]}
+                </MenuItem>)
+            })
+        }).then(setSchemaList);
+    }
+
+    useEffect(() => {
+        getSelection();
+    }, []);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target || !e.target.files) {
             return false;
         }
@@ -33,7 +43,7 @@ const SchemaTreePage = () => {
         };
     };
 
-    const getMappingBlob = () =>{
+    const getMappingBlob = () => {
         const processedExportedData = JSON.stringify(schemaTreeMappingToJson(exportData));
         return saveFile(
             new Blob([processedExportedData], {type: 'application/json'}),
@@ -49,17 +59,23 @@ const SchemaTreePage = () => {
 
     return (
         <div className={"tree-container"}>
+
+            <div id="selection">
+                <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
+            </div>
+
             <div id="trees">
-            <SchemaTreeComponent
-                fetchData={setTreeData}
-            />
-            <SchemaTreeComponent
-                initialTreeData={[ApplicantSchema]}
-                linkedTreeData={treeData}
-                enableAddField={false}
-                enableLinkField={true}
-                exportData={setExportData}
-            />
+                <SchemaTreeComponent
+                    fetchData={setTreeData}
+                />
+
+                <SchemaTreeComponent
+                    initialTreeData={[ApplicantSchema]}
+                    linkedTreeData={treeData}
+                    enableAddField={false}
+                    enableLinkField={true}
+                    exportData={setExportData}
+                />
             </div>
             <div className="button-group">
                 <Button>
@@ -70,7 +86,7 @@ const SchemaTreePage = () => {
                            id='import-schema'
                            name='import-schema'
                            style={{display: 'none'}}
-                               onChange={handleChange}/></Button>
+                           onChange={handleChange}/></Button>
                 <Button onClick={getOriginalSchemaBlob}>Export Schema</Button>
                 <Button>
                     <InputLabel htmlFor='import-mapping'>
@@ -80,7 +96,7 @@ const SchemaTreePage = () => {
                            id='import-mapping'
                            name='import-mapping'
                            style={{display: 'none'}}
-                           onChange={handleChange} />
+                           onChange={handleChange}/>
                 </Button>
                 <Button onClick={getMappingBlob}>Export Mapping</Button>
             </div>

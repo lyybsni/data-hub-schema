@@ -1,4 +1,4 @@
-import {TreeNode} from "../SchemaTree/SchemaTree";
+import {TreeNode} from "../components/SchemaTree/SchemaTree";
 
 export const ApplicantSchema: TreeNode = {
 

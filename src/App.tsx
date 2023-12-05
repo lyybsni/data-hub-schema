@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import SchemaTreePage from "./SchemaTree";
+import SchemaTreePage from "./pages/SchemaTree";
 
 function App() {
   return (
