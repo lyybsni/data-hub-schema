@@ -1,10 +1,11 @@
-import SchemaTreeComponent, {TreeNode} from "../../components/SchemaTree/SchemaTree";
+import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import {ApplicantSchema} from "../../resource/ApplicantSchema";
 import React, {useEffect, useState} from "react";
 import {Button, Input, InputLabel, MenuItem, Select} from "@mui/material";
-import {schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
+import {jsonToSchemaTree, schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
 import {getSchemaList} from "./Schema";
+import {TreeNode} from "../../components/SchemaTree/TreeNode";
 
 const SchemaTreePage = () => {
 
@@ -13,7 +14,7 @@ const SchemaTreePage = () => {
     const [schemaList, setSchemaList] = React.useState([] as any[]);
     const [selectedSchema, setSelectedSchema] = React.useState('');
 
-    const [files, setFiles] = useState("");
+    const [files, setFiles] = useState("[{}]");
 
     const getSelection = () => {
         const list = getSchemaList();
@@ -28,8 +29,29 @@ const SchemaTreePage = () => {
     }
 
     useEffect(() => {
+        // load the data from back end
         getSelection();
     }, []);
+
+    useEffect(() => {
+        console.log(files)
+        if (files === '[{}]') {
+            console.log("IAM")
+            return;
+        }
+
+        const initTreeNode: TreeNode = {
+            id: 'root',
+            name: 'root',
+            path: 'root',
+            children: []
+        }
+
+        const schema = JSON.parse(files)[0];
+        jsonToSchemaTree(schema, initTreeNode);
+        setTreeData(initTreeNode.children ?? []);
+        // console.log(treeData, initTreeNode.children);
+    }, [files, setTreeData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target || !e.target.files) {
@@ -59,16 +81,18 @@ const SchemaTreePage = () => {
 
     return (
         <div className={"tree-container"}>
-
-            <div id="selection">
-                <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
-            </div>
-
             <div id="trees">
+                <div id='left-container'>
                 <SchemaTreeComponent
+                    initialTreeData={treeData}
                     fetchData={setTreeData}
                 />
+                </div>
 
+                <div id='right-container'>
+                    <div id="selection">
+                        <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
+                    </div>
                 <SchemaTreeComponent
                     initialTreeData={[ApplicantSchema]}
                     linkedTreeData={treeData}
@@ -76,6 +100,7 @@ const SchemaTreePage = () => {
                     enableLinkField={true}
                     exportData={setExportData}
                 />
+                </div>
             </div>
             <div className="button-group">
                 <Button>

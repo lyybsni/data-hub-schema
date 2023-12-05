@@ -1,6 +1,7 @@
 import {Button, Modal} from "@mui/material";
 import React from "react";
-import SchemaTreeComponent, {TreeNode} from "./SchemaTree";
+import SchemaTreeComponent from "./SchemaTree";
+import {TreeNode} from "./TreeNode";
 
 const LinkFieldModal = (props: {
     open: boolean,

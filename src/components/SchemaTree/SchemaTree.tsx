@@ -1,17 +1,11 @@
 import {TreeItem, TreeView} from "@mui/x-tree-view";
-import React from "react";
+import React, {useEffect} from "react";
 import {AddBox, ChevronRight, ExpandMore, GifBox} from "@mui/icons-material";
 import AddFieldModal from "./AddFieldModal";
 import LinkFieldModal from "./LinkFieldModal";
-import './SchemaTree.css';
+import '../../pages/SchemaTree/SchemaTree.css';
+import {TreeNode} from "./TreeNode";
 
-export type TreeNode = {
-    id: string,
-    name: string,
-    children?: TreeNode[]
-    path: 'root' | string,
-    linkedPath?: string,
-};
 
 const SchemaTreeComponent = (props : {
     initialTreeData?: TreeNode[],
@@ -50,6 +44,12 @@ const SchemaTreeComponent = (props : {
         const result: (string | null)[] = treeNodes.map(processNode).filter((x) => x !== null);
         return result.length > 0 ? result[0] : null;
     }
+
+    useEffect(() => {
+        if (props.initialTreeData) {
+            setTreeData(props.initialTreeData)
+        }
+    }, [props.initialTreeData]);
 
     const triggerLink = (nodeId: string) => {
         const result = findNode(treeData, nodeId) ?? '';

@@ -1,4 +1,6 @@
-const schemaTreeMappingToJson = (nodes: any[]) => {
+import {TreeNode} from "./TreeNode";
+
+export const schemaTreeMappingToJson = (nodes: any[]) => {
     const result = {} as any;
 
     nodes.forEach(node => {
@@ -17,11 +19,19 @@ const schemaTreeMappingToJson = (nodes: any[]) => {
     return result;
 }
 
-const jsonToSchemaTree = (json: any) => {
 
+export const jsonToSchemaTree = (json: any, root: TreeNode) => {
+    if (!json['id']) return;
+
+    let node: TreeNode = {
+        id: json['id'],
+        name: json['name'],
+        path: root.path + '.' + json['name'],
+        children: []
+    };
+
+    json['children']?.forEach((child: any) => {
+        jsonToSchemaTree(child, node);
+    });
+    root.children?.push(node);
 }
-
-export {
-    schemaTreeMappingToJson,
-    jsonToSchemaTree
-};

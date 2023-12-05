@@ -1,7 +1,7 @@
 import {Button, Input, Modal} from "@mui/material";
 import React from "react";
 
-import './SchemaTree.css';
+import '../../pages/SchemaTree/SchemaTree.css';
 
 const AddFieldModal = (props: {
     open: boolean,

@@ -7,7 +7,7 @@ export type Schema = {
 
 export const getSchemaList = () => {
     return get('/admin/schemas').then(res => {
-        console.log(res);
+        // console.log(res);
         const result = [] as Schema[];
         res.forEach((item: any) => {
             result.push({
