@@ -4,19 +4,26 @@ import React, {useEffect, useState} from "react";
 import {Button, Input, InputLabel, MenuItem, Select} from "@mui/material";
 import {jsonToSchemaTree, schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {getSchemaList} from "./Schema";
+import {getMapping, getMappingUnder, getSchemaList, updateMapping} from "./Schema";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 
 const SchemaTreePage = () => {
 
     const [treeData, setTreeData] = React.useState([] as TreeNode[]);
     const [exportData, setExportData] = React.useState([] as any[]);
+
     const [schemaList, setSchemaList] = React.useState([] as any[]);
+    const [mappingList, setMappingList] = React.useState([] as any[]);
+
     const [selectedSchema, setSelectedSchema] = React.useState('');
+    const [selectedMapping, setSelectedMapping] = React.useState('');
+
+    const [mappingData, setMappingData] = React.useState(new Map<string, string>());
 
     const [files, setFiles] = useState("[{}]");
 
-    const getSelection = () => {
+    useEffect(() => {
+        // load the data from back end
         const list = getSchemaList();
         list.then((res) => {
             return res.map((item) => {
@@ -26,12 +33,19 @@ const SchemaTreePage = () => {
                 </MenuItem>)
             })
         }).then(setSchemaList);
-    }
+    }, []);
 
     useEffect(() => {
-        // load the data from back end
-        getSelection();
-    }, []);
+        if (selectedSchema)
+            getMappingUnder(selectedSchema).then((res) => {
+                return res.map((item) => {
+                    console.log(item)
+                    return (<MenuItem value={item.id} key={item.id}>
+                        {item.id}
+                    </MenuItem>)
+                })
+            }).then(setMappingList);
+    }, [selectedSchema]);
 
     useEffect(() => {
         console.log(files)
@@ -52,6 +66,22 @@ const SchemaTreePage = () => {
         setTreeData(initTreeNode.children ?? []);
         // console.log(treeData, initTreeNode.children);
     }, [files, setTreeData]);
+
+    useEffect(() => {
+        if (!selectedMapping) {
+            return;
+        }
+         getMapping(selectedMapping).then(
+            result => {
+                const data = new Map<string, string>();
+                Array.from(JSON.parse(result.mapping)).forEach((item: any) => {
+                  data.set(item.key, item.value);
+                });
+                console.log(result.mapping, data);
+                setMappingData(data);
+            }
+        )
+    }, [selectedMapping]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target || !e.target.files) {
@@ -90,15 +120,24 @@ const SchemaTreePage = () => {
                 </div>
 
                 <div id='right-container'>
-                    <div id="selection">
+                    <div id="schema-selection">
+                        <InputLabel htmlFor='schema'>Current Schema</InputLabel>
                         <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
+                    </div>
+                    <div id="mapping-selection">
+                        <InputLabel htmlFor='mapping'>Current Mapping</InputLabel>
+                        <Select id="mapping" value={selectedMapping} onChange={(e) => {
+                            const mappingId = e.target.value as string;
+                            setSelectedMapping(mappingId);
+                        }}>{mappingList}</Select>
                     </div>
                 <SchemaTreeComponent
                     initialTreeData={[ApplicantSchema]}
                     linkedTreeData={treeData}
                     enableAddField={false}
                     enableLinkField={true}
-                    exportData={setExportData}
+                    linageMap={mappingData}
+                    exportData={(data) => {setExportData(data); console.log(data);}}
                 />
                 </div>
             </div>
@@ -113,17 +152,18 @@ const SchemaTreePage = () => {
                            style={{display: 'none'}}
                            onChange={handleChange}/></Button>
                 <Button onClick={getOriginalSchemaBlob}>Export Schema</Button>
-                <Button>
-                    <InputLabel htmlFor='import-mapping'>
-                        Import Mapping
-                    </InputLabel>
-                    <Input type="file"
-                           id='import-mapping'
-                           name='import-mapping'
-                           style={{display: 'none'}}
-                           onChange={handleChange}/>
-                </Button>
+                {/*<Button>*/}
+                {/*    <InputLabel htmlFor='import-mapping'>*/}
+                {/*        Import Mapping*/}
+                {/*    </InputLabel>*/}
+                {/*    <Input type="file"*/}
+                {/*           id='import-mapping'*/}
+                {/*           name='import-mapping'*/}
+                {/*           style={{display: 'none'}}*/}
+                {/*           onChange={handleChange}/>*/}
+                {/*</Button>*/}
                 <Button onClick={getMappingBlob}>Export Mapping</Button>
+                <Button onClick={() => updateMapping(selectedSchema, JSON.stringify(exportData))}>Save Mapping</Button>
             </div>
         </div>);
 }

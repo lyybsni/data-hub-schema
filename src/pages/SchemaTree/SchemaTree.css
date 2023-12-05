@@ -42,8 +42,15 @@
     width: 50%;
 }
 
-#right-container .MuiInputBase-root {
-    width: 100%;
+#schema-selection, #mapping-selection {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#schema-selection .MuiInputBase-root, #mapping-selection .MuiInputBase-root{
+    width: 75%;
 }
 
 .button-group {
@@ -66,6 +73,7 @@
 }
 
 .tree-view {
+    display: block;
     width: 50%;
     height: 100%;
     margin: 10px 0 10px;

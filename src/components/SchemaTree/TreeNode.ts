@@ -3,5 +3,4 @@ export type TreeNode = {
     name: string,
     children?: TreeNode[]
     path: 'root' | string,
-    linkedPath?: string,
 };

@@ -1,5 +1,5 @@
 import {TreeItem, TreeView} from "@mui/x-tree-view";
-import React, {useEffect} from "react";
+import React, {useEffect, useMemo} from "react";
 import {AddBox, ChevronRight, ExpandMore, GifBox} from "@mui/icons-material";
 import AddFieldModal from "./AddFieldModal";
 import LinkFieldModal from "./LinkFieldModal";
@@ -20,6 +20,7 @@ const SchemaTreeComponent = (props : {
     setLinkSource?: (nodeId: string, linkedPath: string) => void,
 
     exportData?: (data: any[]) => void,
+    linageMap?: Map<string, string>,
 }) => {
     // a container with a tree view of the schema
 
@@ -29,6 +30,8 @@ const SchemaTreeComponent = (props : {
     const [treeData, setTreeData] = React.useState<TreeNode[]>(props.initialTreeData ?? [
         { id: '1', name: 'Input Root', children: [], path: 'root' } as TreeNode,
     ]);
+
+    const linageMap = useMemo(() => props.linageMap ?? new Map<string, string>(), [props.linageMap])
 
     const findNode = (treeNodes: TreeNode[], targetId: string) : string | null => {
         const processNode = (node: TreeNode): string | null => {
@@ -45,6 +48,7 @@ const SchemaTreeComponent = (props : {
         return result.length > 0 ? result[0] : null;
     }
 
+    // TODO: fix the linking problem
     useEffect(() => {
         if (props.initialTreeData) {
             setTreeData(props.initialTreeData)
@@ -99,9 +103,8 @@ const SchemaTreeComponent = (props : {
         const modifyNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
             return nodes.map((node) => {
                 if (node.id === nodeId) {
-                    return { ...node,
-                        linkedPath: newPath,
-                    };
+                    linageMap.set(node.id, newPath);
+                    return node;
                 } else if (node.children) {
                     return { ...node, children: modifyNode(node.children) };
                 } else {
@@ -111,33 +114,15 @@ const SchemaTreeComponent = (props : {
         };
 
         const result = modifyNode(treeData)
-
-        setTreeData(result);
-        props.fetchData?.(result);
         retrievePathMapping(result);
-        console.log(result)
     }
 
     const retrievePathMapping = (data: TreeNode[]) => {
-        const processNodes = (nodes: TreeNode[]) => {
-            const result: any[] = [];
-            nodes.forEach((node) => {
-                if (node.linkedPath) {
-                    result.push({
-                        [`${node.path}`]: {
-                            from: node.linkedPath
-                        },
-                        // path: node.path,
-                        // linkedPath: node.linkedPath,
-                    });
-                }
-                if (node.children) {
-                    result.push(...processNodes(node.children));
-                }
-            });
-            return result;
-        }
-        props.exportData?.(processNodes(data));
+        const result: any[] = [];
+        Array.from(linageMap.keys()).forEach((key) => {
+            result.push({key: key, value: linageMap.get(key)});
+        });
+        props.exportData?.(result);
     }
 
     /*** Components ***/
@@ -161,7 +146,7 @@ const SchemaTreeComponent = (props : {
             key={node.id} nodeId={node.id} label={<div className="tree-node-label">
             <span>{node.name}</span>
             {AddBoxComponent(node.id)}
-            {LinkBoxComponent(node.linkedPath, node.children ? node.children.length > 0 : false)}
+            {LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}
         </div>}>
             {Array.isArray(node.children) ? node.children.map((node) => renderTree(node)) : null}
         </TreeItem>
