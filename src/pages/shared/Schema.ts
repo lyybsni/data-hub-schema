@@ -1,8 +1,12 @@
-import {get, post} from "../../utils/Request";
+import {get, post, put} from "../../utils/Request";
 
 export type Schema = {
     id: string,
     schema: string,
+}
+
+export const getSchema = async (schemaId: string) => {
+    return await get(`/admin/schema/${schemaId}`);
 }
 
 export const getSchemaList = async () => {
@@ -16,6 +20,13 @@ export const getSchemaList = async () => {
         });
     });
     return result;
+}
+
+export const updateSchema = async (schemaId: string, schema: any) => {
+    return await put(`/admin/schema/${schemaId}`, {
+        id: schemaId,
+        schema: schema,
+    });
 }
 
 export const updateMapping = async (schemaId: string, mapping: any) => {

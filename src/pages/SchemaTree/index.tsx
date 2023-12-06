@@ -1,10 +1,10 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import {ApplicantSchema} from "../../resource/ApplicantSchema";
 import React, {useEffect, useState} from "react";
-import {Button, Input, InputLabel, MenuItem, Select} from "@mui/material";
+import {Box, Button, Input, InputLabel, MenuItem, Select} from "@mui/material";
 import {jsonToSchemaTree, schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {getMapping, getMappingUnder, getSchemaList, updateMapping} from "./Schema";
+import {getMapping, getMappingUnder, getSchemaList, updateMapping} from "../shared/Schema";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 
 const SchemaTreePage = () => {
@@ -24,8 +24,7 @@ const SchemaTreePage = () => {
 
     useEffect(() => {
         // load the data from back end
-        const list = getSchemaList();
-        list.then((res) => {
+        getSchemaList().then((res) => {
             return res.map((item) => {
                 const schema = JSON.parse(item.schema);
                 return (<MenuItem value={item.id} key={item.id}>
@@ -112,14 +111,14 @@ const SchemaTreePage = () => {
     return (
         <div className={"tree-container"}>
             <div id="trees">
-                <div id='left-container'>
+                <Box id='left-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <SchemaTreeComponent
                     initialTreeData={treeData}
                     fetchData={setTreeData}
                 />
-                </div>
+                </Box>
 
-                <div id='right-container'>
+                <Box id='right-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <div id="schema-selection">
                         <InputLabel htmlFor='schema'>Current Schema</InputLabel>
                         <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
@@ -139,7 +138,7 @@ const SchemaTreePage = () => {
                     linageMap={mappingData}
                     exportData={(data) => {setExportData(data); console.log(data);}}
                 />
-                </div>
+                </Box>
             </div>
             <div className="button-group">
                 <Button>

@@ -1,0 +1,12 @@
+
+#schema-page-create-or-modify, #schema-page-selection-group {
+    display: flex;
+    min-height: 60px;
+    align-items: center;
+    padding-left: 15px;
+}
+
+#schema-page-selection-group .MuiInputBase-root{
+    min-width: 50%;
+    margin: 0 10px 0;
+}

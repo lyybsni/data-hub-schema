@@ -19,3 +19,13 @@ export const post = (url: string, data: any) => {
         body: JSON.stringify(data)
     })
 }
+
+export const put = (url: string, data: any) => {
+    return fetch(baseUrl + url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+}
