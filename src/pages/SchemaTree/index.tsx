@@ -1,15 +1,21 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import {ApplicantSchema} from "../../resource/ApplicantSchema";
 import React, {useEffect, useState} from "react";
-import {Box, Button, Input, InputLabel, MenuItem, Select} from "@mui/material";
+import {Box, Button, Input, InputLabel, MenuItem, Paper, Select} from "@mui/material";
 import {jsonToSchemaTree, schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
 import {getMapping, getMappingUnder, getSchemaList, updateMapping} from "../shared/Schema";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 
 const SchemaTreePage = () => {
+    const initTreeData = [{
+        id: '1',
+        name: 'Input Root',
+        children: [],
+        path: 'root'
+    } as TreeNode];
 
-    const [treeData, setTreeData] = React.useState([] as TreeNode[]);
+    const [treeData, setTreeData] = React.useState(initTreeData as TreeNode[]);
     const [exportData, setExportData] = React.useState([] as any[]);
 
     const [schemaList, setSchemaList] = React.useState([] as any[]);
@@ -111,14 +117,14 @@ const SchemaTreePage = () => {
     return (
         <div className={"tree-container"}>
             <div id="trees">
-                <Box id='left-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Paper id='left-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <SchemaTreeComponent
                     initialTreeData={treeData}
                     fetchData={setTreeData}
                 />
-                </Box>
+                </Paper>
 
-                <Box id='right-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Paper id='right-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <div id="schema-selection">
                         <InputLabel htmlFor='schema'>Current Schema</InputLabel>
                         <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
@@ -138,7 +144,7 @@ const SchemaTreePage = () => {
                     linageMap={mappingData}
                     exportData={(data) => {setExportData(data); console.log(data);}}
                 />
-                </Box>
+                </Paper>
             </div>
             <div className="button-group">
                 <Button>

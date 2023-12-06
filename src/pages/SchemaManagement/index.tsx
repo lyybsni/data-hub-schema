@@ -1,7 +1,7 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import React, {useEffect} from "react";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
-import {Button, Checkbox, InputLabel, MenuItem, Select} from "@mui/material";
+import {Button, Checkbox, InputLabel, MenuItem, MenuList, Paper, Select} from "@mui/material";
 import './SchemaManagement.css'
 import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
 
@@ -10,11 +10,12 @@ const CreateSchema = (props: {
     setSelectedSchema: (schema: string) => void,
     schemaList?: any[],
     display?: boolean
-    }) => {
+}) => {
     return (
         <div id='schema-page-selection-group' style={{display: props.display ? 'flex' : 'none'}}>
             <InputLabel htmlFor='schema'>Current Schema</InputLabel>
-            <Select id="schema" value={props.selectedSchema} onChange={(e) => props.setSelectedSchema(e.target.value as string)}>{props.schemaList}</Select>
+            <Select id="schema" value={props.selectedSchema}
+                    onChange={(e) => props.setSelectedSchema(e.target.value as string)}>{props.schemaList}</Select>
         </div>
     );
 };
@@ -31,6 +32,7 @@ export const SchemaManagementPage = () => {
     const [selectedSchema, setSelectedSchema] = React.useState('' as string);
     const [createSchemaMode, setCreateSchemaMode] = React.useState(false as boolean);
     const [schemaList, setSchemaList] = React.useState([] as any[]);
+    const [savedSchema, setSavedSchema] = React.useState([] as any[]);
 
     useEffect(() => {
         getSchemaList().then((res) => {
@@ -46,8 +48,9 @@ export const SchemaManagementPage = () => {
     useEffect(() => {
         if (selectedSchema)
             getSchema(selectedSchema).then((res) => {
-                console.log(res);
-                setTreeData(JSON.parse(res.schema));
+                const target = JSON.parse(res.schema);
+                setTreeData(target);
+                setSavedSchema(target);
             });
     }, [selectedSchema]);
 
@@ -66,28 +69,42 @@ export const SchemaManagementPage = () => {
 
     return (
         <div id='schema-page-container'>
-            <div id='schema-page-create-or-modify'>
-                <Checkbox id='create-schema' checked={createSchemaMode}
-                onChange={(e) => {
-                    setCreateSchemaMode(e.target.checked);
-                    setSelectedSchema('');
-                    setTreeData(e.target.checked ? initTreeData : []);
-                }}/>
-                <InputLabel htmlFor='create-schema'>Create New Schema</InputLabel>
-            </div>
-            <CreateSchema
-                display={!createSchemaMode}
-                selectedSchema={selectedSchema}
-                setSelectedSchema={setSelectedSchema}
-                schemaList={schemaList}
-            />
-            <SchemaTreeComponent
-                initialTreeData={treeData}
-                fetchData={setTreeData}
-            />
-            <div id='schema-page-button-group'>
-                <Button onClick={handleSubmitSchema}>Upload Schema</Button>
-            </div>
+            <Paper id='display-area'>
+                <div id='schema-page-create-or-modify'>
+                    <Checkbox id='create-schema' checked={createSchemaMode}
+                              onChange={(e) => {
+                                  setCreateSchemaMode(e.target.checked);
+                                  setSelectedSchema('');
+                                  setTreeData(e.target.checked ? initTreeData : []);
+                              }}/>
+                    <InputLabel htmlFor='create-schema'>Create New Schema</InputLabel>
+                </div>
+                <CreateSchema
+                    display={!createSchemaMode}
+                    selectedSchema={selectedSchema}
+                    setSelectedSchema={setSelectedSchema}
+                    schemaList={schemaList}
+                />
+                {(createSchemaMode || selectedSchema) ?
+                <SchemaTreeComponent
+                    initialTreeData={treeData}
+                    fetchData={setTreeData}
+                />:<span>No schema selected currently.</span>}
+            </Paper>
+            <Paper id='schema-page-button-group'>
+                Available Functions
+                <MenuList>
+                    <MenuItem><Button onClick={() => {
+                        if (createSchemaMode) {
+                            setTreeData(initTreeData);
+                        } else {
+                            setTreeData(savedSchema);
+                        }
+                    }}>Reset Schema</Button></MenuItem>
+                    <MenuItem><Button onClick={handleSubmitSchema}>Save Schema</Button></MenuItem>
+                    <MenuItem><Button onClick={handleSubmitSchema}>View Information</Button></MenuItem>
+                </MenuList>
+            </Paper>
         </div>
     )
 }
