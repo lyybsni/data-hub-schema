@@ -3,7 +3,7 @@ import React, {useEffect} from "react";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 import {Button, Checkbox, InputLabel, MenuItem, Select} from "@mui/material";
 import './SchemaManagement.css'
-import {getSchema, getSchemaList, updateSchema} from "../shared/Schema";
+import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
 
 const CreateSchema = (props: {
     selectedSchema: string,
@@ -29,7 +29,7 @@ export const SchemaManagementPage = () => {
 
     const [treeData, setTreeData] = React.useState([] as TreeNode[]);
     const [selectedSchema, setSelectedSchema] = React.useState('' as string);
-    const [createSchema, setCreateSchema] = React.useState(false as boolean);
+    const [createSchemaMode, setCreateSchemaMode] = React.useState(false as boolean);
     const [schemaList, setSchemaList] = React.useState([] as any[]);
 
     useEffect(() => {
@@ -57,22 +57,26 @@ export const SchemaManagementPage = () => {
             updateSchema(selectedSchema, JSON.stringify(treeData)).then((res) => {
                 console.log(res);
             });
+        } else {
+            createSchema(JSON.stringify(treeData)).then((res) => {
+                console.log(res);
+            });
         }
     };
 
     return (
         <div id='schema-page-container'>
             <div id='schema-page-create-or-modify'>
-                <Checkbox id='create-schema' checked={createSchema}
+                <Checkbox id='create-schema' checked={createSchemaMode}
                 onChange={(e) => {
-                    setCreateSchema(e.target.checked);
+                    setCreateSchemaMode(e.target.checked);
                     setSelectedSchema('');
                     setTreeData(e.target.checked ? initTreeData : []);
                 }}/>
                 <InputLabel htmlFor='create-schema'>Create New Schema</InputLabel>
             </div>
             <CreateSchema
-                display={!createSchema}
+                display={!createSchemaMode}
                 selectedSchema={selectedSchema}
                 setSelectedSchema={setSelectedSchema}
                 schemaList={schemaList}

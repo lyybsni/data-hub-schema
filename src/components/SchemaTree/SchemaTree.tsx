@@ -5,6 +5,7 @@ import AddFieldModal from "./AddFieldModal";
 import LinkFieldModal from "./LinkFieldModal";
 import '../../pages/SchemaTree/SchemaTree.css';
 import {TreeNode} from "./TreeNode";
+import {DisplayNode} from "./DisplayNode";
 
 
 const SchemaTreeComponent = (props : {
@@ -71,13 +72,15 @@ const SchemaTreeComponent = (props : {
         const newId = Math.random().toString(); // generate a new id for the new node
         const newNode = {
             id: newId,
-            name: name + ':' + type
+            name: name,
+            type: type,
         };
 
         const addNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
             return nodes.map((node) => {
                 if (node.id === parentId) {
                     return { ...node,
+                        type: undefined,
                         children: [...(node.children || []),
                             {
                                 ...newNode,
@@ -144,7 +147,7 @@ const SchemaTreeComponent = (props : {
     const renderTree = (node: TreeNode) => (
         <TreeItem
             key={node.id} nodeId={node.id} label={<div className="tree-node-label">
-            <span>{node.name}</span>
+            <DisplayNode node={node}/>
             {AddBoxComponent(node.id)}
             {LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}
         </div>}>

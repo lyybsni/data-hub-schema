@@ -27,14 +27,20 @@ function App() {
                 {/* <img src={logo} className="App-logo" alt="logo" /> */}
             </header>
 
-            <Box sx={{display: 'flex', 'justify-content': 'space-evenly'}}>
+            <Box id='nav-bar'>
                 <a href='/schema'>Schema Management</a>
                 <a href='/mapping'>Schema Mapping</a>
+                <a href='/example'>Mapping Example</a>
             </Box>
 
-            <div>
+            <div id='main-container'>
                 <RouterProvider router={router}/>
             </div>
+
+            <Box id='footer'>
+                @2023 PolyU Graduate School
+            </Box>
+
 
         </div>
     );

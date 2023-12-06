@@ -22,6 +22,12 @@ export const getSchemaList = async () => {
     return result;
 }
 
+export const createSchema = async (schema: any) => {
+    return await post(`/admin/schema`, {
+        schema: schema,
+    });
+}
+
 export const updateSchema = async (schemaId: string, schema: any) => {
     return await put(`/admin/schema/${schemaId}`, {
         id: schemaId,

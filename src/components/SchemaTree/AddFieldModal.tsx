@@ -1,4 +1,4 @@
-import {Button, Input, Modal} from "@mui/material";
+import {Button, Checkbox, Input, Modal} from "@mui/material";
 import React from "react";
 
 import '../../pages/SchemaTree/SchemaTree.css';
@@ -20,6 +20,10 @@ const AddFieldModal = (props: {
         <div className='modal-input-group'>
             <span>Attribute Type</span>
             <Input type="text" onChange={e => setType(e.target.value)}></Input>
+        </div>
+        <div>
+            <span>Is Array?</span>
+            <Checkbox checked={false}/>
         </div>
         <Button onClick={() => {
             props.handleAddField(name, type);
