@@ -21,7 +21,7 @@ export const PopOver = (
     const id = open ? 'simple-popover' : undefined;
 
     return (
-        <div>
+        <div className='pop-over-base'>
             <span aria-describedby={id} onClick={handleClick}>
             {props.baseText}
         </span>

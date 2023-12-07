@@ -163,22 +163,19 @@ const originalSchemaGroupStyle = css`
 const containerStyle = css`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-evenly;
 `
 
 const leftContainerStyle = css`
   display: flex;
   flex-direction: column;
-  width: 40%;
+  width: calc(40% - 24px);
 `
 
 const rightContainerStyle = css`
   display: flex;
   flex-direction: column;
   width: 60%;
-  
-  padding-left: 10px;
-  padding-right: 10px;
 `;
 
 

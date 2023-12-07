@@ -8,6 +8,8 @@ export const SchemaSelection = (
         setSelectedSchema: (schema: string) => void,
         setSelectedMapping: (mapping: string) => void,
         setMappingData: (mapping: Map<string, string>) => void,
+
+        style?: any
     }
 ) => {
 
@@ -56,7 +58,7 @@ export const SchemaSelection = (
         )
     }, [props, selectedMapping]);
 
-    return (<div className={schemaSelectionStyle}>
+    return (<div className={props.style ?? schemaSelectionStyle}>
         <FormControl className="schema-selection">
             <InputLabel htmlFor='schema'>Current Schema</InputLabel>
             <Select id="schema"

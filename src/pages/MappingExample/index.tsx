@@ -1,14 +1,29 @@
-import {Button, FormControl, InputLabel, List, ListItem, Menu, MenuItem, Paper, TextField} from "@mui/material"
+import {
+    Button,
+    FormControl,
+    FormControlLabel,
+    InputLabel,
+    List,
+    ListItem,
+    Paper, Switch,
+    TextField
+} from "@mui/material"
 import {css} from "@emotion/css";
 import React, {ChangeEvent} from "react";
 import {PopOver} from "../../components/Menu/PopOverText";
 import {HelpOutlineRounded} from "@mui/icons-material";
 import {Hint} from "./Hint";
+import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 
 export const MappingExample = () => {
 
     const [shrink, setShrink] = React.useState(false);
     const [rawData, setRawData] = React.useState('');
+    const [uploadFromFile, setUploadFromFile] = React.useState(false);
+
+const [selectedSchema, setSelectedSchema] = React.useState('');
+const [selectedMapping, setSelectedMapping] = React.useState('' as string);
+const [mappingData, setMappingData] = React.useState(new Map<string, string>());
 
     const handleRawDataInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         if (e.target.value) {
@@ -24,6 +39,13 @@ export const MappingExample = () => {
             <Paper className={exampleDataAreaStyle}>
                 <div>
                     <h3>Example Data</h3>
+                    <FormControlLabel control={<Switch
+                        value={uploadFromFile}
+                        onChange={(e) => setUploadFromFile(e.target.checked)}
+                    />} label={'Upload From File?'}/>
+                    <FormControl>
+                        <Button>Upload File</Button>
+                    </FormControl>
                     <FormControl className={rawDataStyle}>
                         <InputLabel htmlFor='text-area' shrink={shrink}>
                             Raw Data
@@ -37,23 +59,33 @@ export const MappingExample = () => {
                             onChange={handleRawDataInput}
                         />
                     </FormControl>
-                </div>
-                <div>
-                    <h3>Visualization</h3>
+                    <div>
+                        Your input is received.
+                    </div>
                 </div>
             </Paper>
             <Paper className={operationAreaStyle}>
-                <div>
-                    <PopOver baseText={<HelpOutlineRounded/>} popoverText={<Hint/>}/>
+                <div className={operationsStyle}>
                     <h3>Operations</h3>
+                    <PopOver baseText={<HelpOutlineRounded sx={{height: '16px', width: '16px'}}/>} popoverText={<Hint/>}/>
                 </div>
-                <List>
-                    <ListItem><Button>Data Visualization</Button></ListItem>
-                    <ListItem><Button>Upload File</Button></ListItem>
+                <SchemaSelection setSelectedSchema={setSelectedSchema}
+                                 setSelectedMapping={setSelectedMapping}
+                                 setMappingData={setMappingData}
+                                style={selectionOverrideStyle}
+                />
+                <List className={css`li { button { margin: auto }}`}>
+                    <ListItem><Button>Go!</Button></ListItem>
+                    <ListItem><Button>Check Original Schema</Button></ListItem>
+                    <ListItem><Button>Check Target Schema</Button></ListItem>
+                    <ListItem><Button>Check Mapping Rules</Button></ListItem>
                 </List>
             </Paper>
             <Paper className={resultDataAreaStyle}>
                 <div><h3>View</h3></div>
+                <div className={resultDataStyle}>
+                    YOUR DATA
+                </div>
             </Paper>
             </div>
     )
@@ -81,3 +113,38 @@ const rawDataStyle = css`
   width: calc(100% - 12px);
   margin: auto;
 `;
+
+const operationsStyle = css`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  
+  .pop-over-base {
+    height: 16px;
+    width: 16px;
+    
+    margin-left: 2px;
+  }
+`;
+
+const selectionOverrideStyle = css`
+  display: flex;
+  flex-direction: column;
+
+  .schema-selection {
+    margin: 0 10px 5px 10px;
+  }
+`;
+
+const resultDataStyle = css`
+  min-width: 100px;
+  min-height: 400px;
+  
+  border: 1px solid black;
+  margin: 10px 2px 10px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`

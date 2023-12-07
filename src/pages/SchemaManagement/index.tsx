@@ -79,8 +79,9 @@ export const SchemaManagementPage = () => {
 
     return (
         <div className={containerStyle}>
-            <Paper className={schemaFilterStyle}>
-                <FormControl id='schema-page-create-or-modify'>
+            <Paper className={schemaFactoryStyle}>
+                <h3>Schema Factory</h3>
+                <FormControl className={schemaFilterStyle}>
                     <FormControlLabel control={<Switch id='create-schema'
                                                        value={createSchemaMode}
                                                          onChange={(e) => {
@@ -96,6 +97,7 @@ export const SchemaManagementPage = () => {
                     schemaList={schemaList}
                 />
             </Paper>
+
             <Paper className={css`min-width: calc(70% - 300px);`}>
                 <h3>Schema Playground</h3>
                 {(createSchemaMode || selectedSchema) ?
@@ -105,7 +107,8 @@ export const SchemaManagementPage = () => {
                         enableAddField={true}
                     />:<span>No schema selected currently.</span>}
             </Paper>
-            <Paper id='schema-page-button-group'>
+
+            <Paper className={css`min-width: 280px`}>
                 <h3>Functions</h3>
                 <MenuList>
                     <MenuItem><Button onClick={() => {
@@ -129,8 +132,11 @@ const containerStyle = css`
   justify-content: space-evenly;
 `;
 
+const schemaFactoryStyle = css`
+  min-width: 30%;
+`;
+
 const schemaFilterStyle = css`
-    min-width: 30%;
     text-align: left;
     padding-left: 30px;
     padding-right: 30px;
