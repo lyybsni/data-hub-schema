@@ -49,17 +49,6 @@
     padding-right: 30px;
 }
 
-#schema-selection, #mapping-selection {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#schema-selection .MuiInputBase-root, #mapping-selection .MuiInputBase-root{
-    width: 75%;
-}
-
 .button-group {
     display: flex;
     flex-direction: row;

@@ -4,7 +4,7 @@ import {AddBox, ChevronRight, ExpandMore, GifBox} from "@mui/icons-material";
 import AddFieldModal from "./AddFieldModal";
 import LinkFieldModal from "./LinkFieldModal";
 import '../../pages/SchemaTree/SchemaTree.css';
-import {TreeNode} from "./TreeNode";
+import {BasicNode, TreeNode} from "./TreeNode";
 import {DisplayNode} from "./DisplayNode";
 
 
@@ -63,35 +63,34 @@ const SchemaTreeComponent = (props : {
         return result;
     }
 
-    const handleAddField = (name: string, type: string) => {
+    const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
-        handleAddNode(originalSchemaNode, name, type);
+        handleAddNode(originalSchemaNode, node);
     }
 
-    const handleAddNode = (parentId: string, name: string, type: string) => {
+    const handleAddNode = (parentId: string, node: BasicNode) => {
         const newId = Math.random().toString(); // generate a new id for the new node
         const newNode = {
             id: newId,
-            name: name,
-            type: type,
+            ...node
         };
 
         const addNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
-            return nodes.map((node) => {
-                if (node.id === parentId) {
-                    return { ...node,
+            return nodes.map((child) => {
+                if (child.id === parentId) {
+                    return { ...child,
                         type: undefined,
-                        children: [...(node.children || []),
+                        children: [...(child.children || []),
                             {
                                 ...newNode,
-                                path: node.path + '.' + name,
+                                path: child.path + '.' + node.name,
                             }
                         ] as TreeNode[]
                     };
-                } else if (node.children) {
-                    return { ...node, children: addNode(node.children) };
+                } else if (child.children) {
+                    return { ...child, children: addNode(child.children) };
                 } else {
-                    return node;
+                    return child;
                 }
             });
         };

@@ -1,7 +1,17 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import React, {useEffect} from "react";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
-import {Button, Checkbox, InputLabel, MenuItem, MenuList, Paper, Select} from "@mui/material";
+import {
+    Button,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    InputLabel,
+    MenuItem,
+    MenuList,
+    Paper,
+    Select
+} from "@mui/material";
 import './SchemaManagement.css'
 import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
 
@@ -12,11 +22,13 @@ const CreateSchema = (props: {
     display?: boolean
 }) => {
     return (
-        <div id='schema-page-selection-group' style={{display: props.display ? 'flex' : 'none'}}>
+        <FormControl id='schema-page-selection-group' style={{display: props.display ? 'flex' : 'none'}}>
             <InputLabel htmlFor='schema'>Current Schema</InputLabel>
-            <Select id="schema" value={props.selectedSchema}
+            <Select id="schema"
+                    fullWidth
+                    value={props.selectedSchema}
                     onChange={(e) => props.setSelectedSchema(e.target.value as string)}>{props.schemaList}</Select>
-        </div>
+        </FormControl>
     );
 };
 
@@ -37,9 +49,8 @@ export const SchemaManagementPage = () => {
     useEffect(() => {
         getSchemaList().then((res) => {
             return res.map((item) => {
-                const schema = JSON.parse(item.schema);
                 return (<MenuItem value={item.id} key={item.id}>
-                    {Object.keys(schema)[0]}
+                    {item.schema.name ?? item.id}
                 </MenuItem>)
             })
         }).then(setSchemaList);
@@ -70,15 +81,15 @@ export const SchemaManagementPage = () => {
     return (
         <div id='schema-page-container'>
             <Paper id='display-area'>
-                <div id='schema-page-create-or-modify'>
-                    <Checkbox id='create-schema' checked={createSchemaMode}
-                              onChange={(e) => {
-                                  setCreateSchemaMode(e.target.checked);
-                                  setSelectedSchema('');
-                                  setTreeData(e.target.checked ? initTreeData : []);
-                              }}/>
-                    <InputLabel htmlFor='create-schema'>Create New Schema</InputLabel>
-                </div>
+                <FormControl id='schema-page-create-or-modify'>
+
+                    <FormControlLabel control={<Checkbox id='create-schema' checked={createSchemaMode}
+                                                         onChange={(e) => {
+                                                             setCreateSchemaMode(e.target.checked);
+                                                             setSelectedSchema('');
+                                                             setTreeData(e.target.checked ? initTreeData : []);
+                                                         }}/>} label={'Create New Schema'}/>
+                </FormControl>
                 <CreateSchema
                     display={!createSchemaMode}
                     selectedSchema={selectedSchema}

@@ -8,18 +8,6 @@
     min-width: calc(100vw - 300px);
 }
 
-#schema-page-create-or-modify, #schema-page-selection-group {
-    display: flex;
-    min-height: 60px;
-    align-items: center;
-    padding-left: 15px;
-}
-
-#schema-page-selection-group .MuiInputBase-root{
-    min-width: 50%;
-    margin: 0 10px 0;
-}
-
 .MuiPaper-root {
     margin-top: 15px;
     padding-top: 15px;

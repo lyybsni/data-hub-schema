@@ -1,7 +1,7 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import {ApplicantSchema} from "../../resource/ApplicantSchema";
 import React, {useEffect, useState} from "react";
-import {Box, Button, Input, InputLabel, MenuItem, Paper, Select} from "@mui/material";
+import {Box, Button, FormControl, Input, InputLabel, MenuItem, Paper, Select} from "@mui/material";
 import {jsonToSchemaTree, schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
 import {getMapping, getMappingUnder, getSchemaList, updateMapping} from "../shared/Schema";
@@ -32,9 +32,8 @@ const SchemaTreePage = () => {
         // load the data from back end
         getSchemaList().then((res) => {
             return res.map((item) => {
-                const schema = JSON.parse(item.schema);
                 return (<MenuItem value={item.id} key={item.id}>
-                    {Object.keys(schema)[0]}
+                    {item.schema.name ?? item.id}
                 </MenuItem>)
             })
         }).then(setSchemaList);
@@ -125,17 +124,25 @@ const SchemaTreePage = () => {
                 </Paper>
 
                 <Paper id='right-container' sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <div id="schema-selection">
+                    <FormControl id="schema-selection">
                         <InputLabel htmlFor='schema'>Current Schema</InputLabel>
-                        <Select id="schema" value={selectedSchema} onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
-                    </div>
-                    <div id="mapping-selection">
+                        <Select id="schema"
+                                fullWidth
+                                label="Current Schema"
+                                value={selectedSchema}
+                                onChange={(e) => setSelectedSchema(e.target.value as string)}>{schemaList}</Select>
+                    </FormControl>
+                    <FormControl id="mapping-selection">
                         <InputLabel htmlFor='mapping'>Current Mapping</InputLabel>
-                        <Select id="mapping" value={selectedMapping} onChange={(e) => {
+                        <Select id="mapping"
+                                fullWidth
+                                label="Current Mapping"
+                                value={selectedMapping}
+                                onChange={(e) => {
                             const mappingId = e.target.value as string;
                             setSelectedMapping(mappingId);
                         }}>{mappingList}</Select>
-                    </div>
+                    </FormControl>
                 <SchemaTreeComponent
                     initialTreeData={[ApplicantSchema]}
                     linkedTreeData={treeData}

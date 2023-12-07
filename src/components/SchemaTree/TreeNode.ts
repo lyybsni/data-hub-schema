@@ -1,3 +1,9 @@
+export type BasicNode = {
+    name: string,
+    type?: string,
+    isArray?: boolean,
+}
+
 export type TreeNode = {
     id: string,
     name: string,

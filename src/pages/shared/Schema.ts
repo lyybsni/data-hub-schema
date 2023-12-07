@@ -2,21 +2,21 @@ import {get, post, put} from "../../utils/Request";
 
 export type Schema = {
     id: string,
-    schema: string,
+    schema: any,
 }
 
 export const getSchema = async (schemaId: string) => {
     return await get(`/admin/schema/${schemaId}`);
 }
 
-export const getSchemaList = async () => {
+export const getSchemaList = async (): Promise<Schema[]> => {
     const res = await get('/admin/schemas');
     // console.log(res);
     const result = [] as Schema[];
     res.forEach((item: any) => {
         result.push({
             id: item.id,
-            schema: item.schema,
+            schema: JSON.parse(item.schema)[0],
         });
     });
     return result;
