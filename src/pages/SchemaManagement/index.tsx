@@ -3,14 +3,13 @@ import React, {useEffect} from "react";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 import {
     Button,
-    Checkbox,
     FormControl,
     FormControlLabel,
     InputLabel,
     MenuItem,
     MenuList,
     Paper,
-    Select
+    Select, Switch
 } from "@mui/material";
 import './SchemaManagement.css'
 import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
@@ -80,10 +79,11 @@ export const SchemaManagementPage = () => {
 
     return (
         <div id='schema-page-container'>
-            <Paper id='display-area'>
+            <Paper id='schema-filter'>
                 <FormControl id='schema-page-create-or-modify'>
 
-                    <FormControlLabel control={<Checkbox id='create-schema' checked={createSchemaMode}
+                    <FormControlLabel control={<Switch id='create-schema'
+                                                       value={createSchemaMode}
                                                          onChange={(e) => {
                                                              setCreateSchemaMode(e.target.checked);
                                                              setSelectedSchema('');
@@ -96,11 +96,14 @@ export const SchemaManagementPage = () => {
                     setSelectedSchema={setSelectedSchema}
                     schemaList={schemaList}
                 />
+            </Paper>
+            <Paper id='tree-area'>
                 {(createSchemaMode || selectedSchema) ?
-                <SchemaTreeComponent
-                    initialTreeData={treeData}
-                    fetchData={setTreeData}
-                />:<span>No schema selected currently.</span>}
+                    <SchemaTreeComponent
+                        initialTreeData={treeData}
+                        fetchData={setTreeData}
+                        enableAddField={true}
+                    />:<span>No schema selected currently.</span>}
             </Paper>
             <Paper id='schema-page-button-group'>
                 Available Functions

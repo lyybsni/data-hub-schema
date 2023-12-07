@@ -19,7 +19,7 @@ const LinkFieldModal = (props: {
     const container = <div className='modal-container'>
         <SchemaTreeComponent
             initialTreeData={props.treeData}
-            enableAddField={false}
+            //enableAddField={false}
             // setSelectedNode={setLinkedSchemaNode}
             setSelectedPath={setSelectedPath}
             />

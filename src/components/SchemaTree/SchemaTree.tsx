@@ -1,14 +1,15 @@
 import {TreeItem, TreeView} from "@mui/x-tree-view";
 import React, {useEffect, useMemo} from "react";
-import {AddBox, ChevronRight, ExpandMore, GifBox} from "@mui/icons-material";
+import {ChevronRight, ExpandMore} from "@mui/icons-material";
 import AddFieldModal from "./AddFieldModal";
 import LinkFieldModal from "./LinkFieldModal";
 import '../../pages/SchemaTree/SchemaTree.css';
 import {BasicNode, TreeNode} from "./TreeNode";
 import {DisplayNode} from "./DisplayNode";
+import MenuListComposition from "../Menu/NodeMenu";
 
 
-const SchemaTreeComponent = (props : {
+const SchemaTreeComponent = (props: {
     initialTreeData?: TreeNode[],
     linkedTreeData?: TreeNode[],
 
@@ -29,12 +30,12 @@ const SchemaTreeComponent = (props : {
     const [addFieldModalOpen, setAddFieldModalOpen] = React.useState(false);
     const [linkFieldModalOpen, setLinkFieldModalOpen] = React.useState(false);
     const [treeData, setTreeData] = React.useState<TreeNode[]>(props.initialTreeData ?? [
-        { id: '1', name: 'Input Root', children: [], path: 'root' } as TreeNode,
+        {id: '1', name: 'Input Root', children: [], path: 'root'} as TreeNode,
     ]);
 
     const linageMap = useMemo(() => props.linageMap ?? new Map<string, string>(), [props.linageMap])
 
-    const findNode = (treeNodes: TreeNode[], targetId: string) : string | null => {
+    const findNode = (treeNodes: TreeNode[], targetId: string): string | null => {
         const processNode = (node: TreeNode): string | null => {
             if (node.id === targetId) {
                 return node.path;
@@ -78,7 +79,8 @@ const SchemaTreeComponent = (props : {
         const addNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
             return nodes.map((child) => {
                 if (child.id === parentId) {
-                    return { ...child,
+                    return {
+                        ...child,
                         type: undefined,
                         children: [...(child.children || []),
                             {
@@ -88,7 +90,7 @@ const SchemaTreeComponent = (props : {
                         ] as TreeNode[]
                     };
                 } else if (child.children) {
-                    return { ...child, children: addNode(child.children) };
+                    return {...child, children: addNode(child.children)};
                 } else {
                     return child;
                 }
@@ -108,7 +110,7 @@ const SchemaTreeComponent = (props : {
                     linageMap.set(node.id, newPath);
                     return node;
                 } else if (node.children) {
-                    return { ...node, children: modifyNode(node.children) };
+                    return {...node, children: modifyNode(node.children)};
                 } else {
                     return node;
                 }
@@ -128,27 +130,30 @@ const SchemaTreeComponent = (props : {
     }
 
     /*** Components ***/
-
-    const AddBoxComponent = (id: string) => <span hidden={!(props.enableAddField ?? true)}><AddBox onClick={() => {
-        setAddFieldModalOpen(true);
-        setOriginalSchemaNode(id);
-    }}/></span>;
-
-    const LinkBoxComponent = (linkedPath?: string, hasChildren?: boolean) =>
-        <span hidden={!(props.enableLinkField ?? false) || hasChildren} title={linkedPath}>
-            <GifBox
-                color={!linkedPath ? 'primary' : 'disabled'}
-                onClick={() => {
-                setLinkFieldModalOpen(true);
-                }}/>
-        </span>
+    const enabled = [] as string[];
+    if (props.enableAddField) {
+        enabled.push('add');
+        enabled.push('modify');
+        enabled.push('delete');
+    }
+    if (props.enableLinkField) {
+        enabled.push('link');
+    }
 
     const renderTree = (node: TreeNode) => (
         <TreeItem
             key={node.id} nodeId={node.id} label={<div className="tree-node-label">
             <DisplayNode node={node}/>
-            {AddBoxComponent(node.id)}
-            {LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}
+            {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
+            <span><MenuListComposition enabled={enabled}
+                                       onAdd={() => {
+                                           setAddFieldModalOpen(true);
+                                           setOriginalSchemaNode(node.id);
+                                       }}
+                                       onLink={() => {
+                                           setLinkFieldModalOpen(true);
+                                       }}
+            /></span>
         </div>}>
             {Array.isArray(node.children) ? node.children.map((node) => renderTree(node)) : null}
         </TreeItem>
@@ -183,8 +188,8 @@ const SchemaTreeComponent = (props : {
 
                         console.log("Selected node", node)
                     }
-                }
-                    defaultCollapseIcon={<ExpandMore />}
+                    }
+                    defaultCollapseIcon={<ExpandMore/>}
                     defaultExpandIcon={<ChevronRight/>}>
                     {treeData.map((node) => renderTree(node))}
                 </TreeView>

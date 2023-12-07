@@ -120,6 +120,7 @@ const SchemaTreePage = () => {
                 <SchemaTreeComponent
                     initialTreeData={treeData}
                     fetchData={setTreeData}
+                    enableAddField={true}
                 />
                 </Paper>
 
