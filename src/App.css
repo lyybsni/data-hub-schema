@@ -41,13 +41,6 @@
   text-decoration: none;
 }
 
-#main-container {
-  margin-left: 3%;
-  margin-right: 3%;
-  min-height: calc(100vh - 75px);
-  grid-auto-flow: column;
-}
-
 #footer {
   background: rgba(178, 34, 34, 0.5);
   min-height: 15px;

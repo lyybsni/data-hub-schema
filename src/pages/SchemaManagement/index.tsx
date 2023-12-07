@@ -11,8 +11,8 @@ import {
     Paper,
     Select, Switch
 } from "@mui/material";
-import './SchemaManagement.css'
 import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
+import {css} from "@emotion/css";
 
 const CreateSchema = (props: {
     selectedSchema: string,
@@ -21,7 +21,7 @@ const CreateSchema = (props: {
     display?: boolean
 }) => {
     return (
-        <FormControl id='schema-page-selection-group' style={{display: props.display ? 'flex' : 'none'}}>
+        <FormControl id='schema-page-selection-group' disabled={!props.display} sx={{display: 'flex'}}>
             <InputLabel htmlFor='schema'>Current Schema</InputLabel>
             <Select id="schema"
                     fullWidth
@@ -78,10 +78,9 @@ export const SchemaManagementPage = () => {
     };
 
     return (
-        <div id='schema-page-container'>
-            <Paper id='schema-filter'>
+        <div className={containerStyle}>
+            <Paper className={schemaFilterStyle}>
                 <FormControl id='schema-page-create-or-modify'>
-
                     <FormControlLabel control={<Switch id='create-schema'
                                                        value={createSchemaMode}
                                                          onChange={(e) => {
@@ -97,7 +96,8 @@ export const SchemaManagementPage = () => {
                     schemaList={schemaList}
                 />
             </Paper>
-            <Paper id='tree-area'>
+            <Paper className={css`min-width: calc(70% - 300px);`}>
+                <h3>Schema Playground</h3>
                 {(createSchemaMode || selectedSchema) ?
                     <SchemaTreeComponent
                         initialTreeData={treeData}
@@ -106,7 +106,7 @@ export const SchemaManagementPage = () => {
                     />:<span>No schema selected currently.</span>}
             </Paper>
             <Paper id='schema-page-button-group'>
-                Available Functions
+                <h3>Functions</h3>
                 <MenuList>
                     <MenuItem><Button onClick={() => {
                         if (createSchemaMode) {
@@ -122,3 +122,16 @@ export const SchemaManagementPage = () => {
         </div>
     )
 }
+
+const containerStyle = css`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+`;
+
+const schemaFilterStyle = css`
+    min-width: 30%;
+    text-align: left;
+    padding-left: 30px;
+    padding-right: 30px;
+`;

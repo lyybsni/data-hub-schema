@@ -4,6 +4,8 @@ import SchemaTreePage from "./pages/SchemaTree";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {Box} from "@mui/material";
 import {SchemaManagementPage} from "./pages/SchemaManagement";
+import {MappingExample} from "./pages/MappingExample";
+import {css} from "@emotion/css";
 
 function App() {
     const router = createBrowserRouter([
@@ -18,6 +20,10 @@ function App() {
         {
             path: "/schema",
             element: <SchemaManagementPage/>
+        },
+        {
+            path: "/example",
+            element: <MappingExample/>
         }
     ]);
 
@@ -33,7 +39,7 @@ function App() {
                 <a href='/example'>Mapping Example</a>
             </Box>
 
-            <div id='main-container'>
+            <div className={mainContainerStyle}>
                 <RouterProvider router={router}/>
             </div>
 
@@ -45,5 +51,13 @@ function App() {
         </div>
     );
 }
+
+const mainContainerStyle = css`
+  margin-left: 3%;
+  margin-right: 3%;
+  min-height: calc(100vh - 105px);
+  grid-auto-flow: column;
+  padding-top: 30px;
+`;
 
 export default App;

@@ -2,6 +2,7 @@ import {Button, Modal} from "@mui/material";
 import React from "react";
 import SchemaTreeComponent from "./SchemaTree";
 import {TreeNode} from "./TreeNode";
+import {modalStyle} from "../shared/ModalStyle";
 
 const LinkFieldModal = (props: {
     open: boolean,
@@ -16,7 +17,7 @@ const LinkFieldModal = (props: {
     // const [linkedSchemaNode, setLinkedSchemaNode] = React.useState('');
     const [selectedPath, setSelectedPath] = React.useState('' as string);
 
-    const container = <div className='modal-container'>
+    const container = <div className={modalStyle}>
         <SchemaTreeComponent
             initialTreeData={props.treeData}
             //enableAddField={false}

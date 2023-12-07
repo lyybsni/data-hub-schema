@@ -4,6 +4,7 @@ import React from "react";
 import '../../pages/SchemaTree/SchemaTree.css';
 import {Form, FormikProvider, useFormik} from "formik";
 import {BasicNode} from "./TreeNode";
+import {modalStyle} from "../shared/ModalStyle";
 
 const AddFieldModal = (props: {
     open: boolean,
@@ -28,7 +29,7 @@ const AddFieldModal = (props: {
         }
     );
 
-    const container = <div className='modal-container'>
+    const container = <div className={modalStyle}>
         <FormikProvider value={formik}>
             <Form onSubmit={formik.handleSubmit}>
                 <FormControl>
