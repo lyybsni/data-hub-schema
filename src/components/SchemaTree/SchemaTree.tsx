@@ -47,7 +47,24 @@ const SchemaTreeComponent = (props: {
             }
         }
 
-        const result: (TreeNode | null)[] = treeNodes.map(processNode).filter((x) => x !== null);
+        // TODO: enhance
+        const result: (TreeNode | null)[] = treeNodes.map(processNode).filter((x) => !!x);
+        return result.length > 0 ? result[0] : null;
+    }
+
+    const findParent = (treeNodes: TreeNode[], targetId: string): TreeNode | null => {
+        const processNode = (node: TreeNode): TreeNode | null => {
+            if (node.children?.find((child) => child.id === targetId)) {
+                return node;
+            } else if (node.children) {
+                return findNode(node.children, targetId);
+            } else {
+                return null;
+            }
+        }
+
+        const result: (TreeNode | null)[] = treeNodes.map(processNode).filter((x) => !!x);
+        console.log(result);
         return result.length > 0 ? result[0] : null;
     }
 
@@ -72,6 +89,15 @@ const SchemaTreeComponent = (props: {
     const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
         handleAddNode(originalSchemaNode.id, node);
+    }
+
+    const handleDeleteNode = (nodeId: string) => {
+        const parent = findParent(treeData, nodeId);
+        if (parent) {
+            parent.children = parent?.children?.filter((child) => child.id !== nodeId);
+            setTreeData([...treeData]);
+            props.fetchData?.(treeData);
+        }
     }
 
     const handleModifyNode = (nodeId: string, newValue: BasicNode) => {
@@ -177,6 +203,10 @@ const SchemaTreeComponent = (props: {
                                        onLink={() => {
                                            setLinkFieldModalOpen(true);
                                        }}
+                                       onDelete={() => {
+                                           // TODO: add a confirmation pop up
+                                           handleDeleteNode(node.id);
+                                       }}
             /></span>
         </div>}>
             {Array.isArray(node.children) ? node.children.map((node) => renderTree(node)) : null}
@@ -187,14 +217,14 @@ const SchemaTreeComponent = (props: {
 
     return (
         <div className="tree-view">
-            <AddFieldModal
+            {addFieldModalOpen ? <AddFieldModal
                 open={addFieldModalOpen}
                 handleClose={() => setAddFieldModalOpen(false)}
                 onAdd={handleAddField}
 
                 initialValues={originalSchemaNode ?? null}
                 onModify={onModify ? (v) => handleModifyNode(originalSchemaNode.id, v) : undefined}
-            />
+            /> : <div/>}
             <LinkFieldModal
                 treeData={props.linkedTreeData ?? []}
                 open={linkFieldModalOpen}
