@@ -9,7 +9,7 @@ const LinkFieldModal = (props: {
     handleClose: () => void,
 
     treeData: TreeNode[],       // input schema for linkage
-    onConfirm: (nodeId: string) => string,      // add the link
+    onConfirm: (nodeId: string) => string | null,      // add the link
     schemaNode: string,         // nodeId of the node to be modified
     modifySchemaNodePath: (nodeId: string, path: string) => void,
 }) => {

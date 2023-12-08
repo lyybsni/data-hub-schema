@@ -96,7 +96,7 @@ export default function MenuListComposition(
                 <Button
                     ref={anchorRef}
                     id="composition-button"
-                    sx={{padding: 0, 'min-width': '16px', 'min-height': '16px'}}
+                    sx={{padding: 0, minWidth: '16px', minHeight: '16px'}}
                     aria-controls={open ? 'composition-menu' : undefined}
                     aria-expanded={open ? 'true' : undefined}
                     aria-haspopup="true"

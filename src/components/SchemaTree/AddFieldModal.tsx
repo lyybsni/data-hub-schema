@@ -9,23 +9,31 @@ import {modalStyle} from "../shared/ModalStyle";
 const AddFieldModal = (props: {
     open: boolean,
     handleClose: () => void,
-    handleAddField: (node: BasicNode) => void
+    onAdd: (node: BasicNode) => void,
+
+    initialValues?: BasicNode,
+    onModify?: ((newNode: BasicNode) => void) | undefined
 }) => {
     const formik = useFormik(
         {
-            initialValues: {
+            initialValues: (props.onModify && props.initialValues) ? {
+                ...props.initialValues,
+                isArray: props.initialValues.type === 'array'
+            } : {
                 isArray: false,
                 name: '',
                 type: ''
             },
             onSubmit: async (values) => {
-                props.handleAddField( {
-                    name: values.name,
-                    type: values.type,
-                    isArray: values.isArray,
-                } as BasicNode);
+                const node = {...values};
+                if (!props.onModify) {
+                    props.onAdd( node);
+                } else {
+                    props.onModify(node);
+                }
                 formik.resetForm();
-            }
+            },
+            enableReinitialize: true
         }
     );
 
@@ -62,6 +70,8 @@ const AddFieldModal = (props: {
     const handleClose = () => {
         props.handleClose();
     }
+
+    console.log(props);
 
     return (
         <Modal children={container} open={props.open} onClose={handleClose}/>

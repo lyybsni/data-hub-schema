@@ -26,19 +26,20 @@ const SchemaTreeComponent = (props: {
 }) => {
     // a container with a tree view of the schema
 
-    const [originalSchemaNode, setOriginalSchemaNode] = React.useState('');
+    const [originalSchemaNode, setOriginalSchemaNode] = React.useState({} as TreeNode);
     const [addFieldModalOpen, setAddFieldModalOpen] = React.useState(false);
     const [linkFieldModalOpen, setLinkFieldModalOpen] = React.useState(false);
+    const [onModify, setOnModify] = React.useState(false);
     const [treeData, setTreeData] = React.useState<TreeNode[]>(props.initialTreeData ?? [
         {id: '1', name: 'Input Root', children: [], path: 'root'} as TreeNode,
     ]);
 
     const linageMap = useMemo(() => props.linageMap ?? new Map<string, string>(), [props.linageMap])
 
-    const findNode = (treeNodes: TreeNode[], targetId: string): string | null => {
-        const processNode = (node: TreeNode): string | null => {
+    const findNode = (treeNodes: TreeNode[], targetId: string): TreeNode | null => {
+        const processNode = (node: TreeNode): TreeNode | null => {
             if (node.id === targetId) {
-                return node.path;
+                return node;
             } else if (node.children) {
                 return findNode(node.children, targetId);
             } else {
@@ -46,7 +47,7 @@ const SchemaTreeComponent = (props: {
             }
         }
 
-        const result: (string | null)[] = treeNodes.map(processNode).filter((x) => x !== null);
+        const result: (TreeNode | null)[] = treeNodes.map(processNode).filter((x) => x !== null);
         return result.length > 0 ? result[0] : null;
     }
 
@@ -60,13 +61,29 @@ const SchemaTreeComponent = (props: {
     const triggerLink = (nodeId: string) => {
         const result = findNode(treeData, nodeId) ?? '';
         console.log("I am here", nodeId, result);
-        props.setLinkSource?.(nodeId, result);
-        return result;
+        if (result) {
+            const path = result.path;
+            props.setLinkSource?.(nodeId, path);
+            return path;
+        }
+        return null;
     }
 
     const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
-        handleAddNode(originalSchemaNode, node);
+        handleAddNode(originalSchemaNode.id, node);
+    }
+
+    const handleModifyNode = (nodeId: string, newValue: BasicNode) => {
+        const treeDataCopy = [...treeData];
+        const targetNode = findNode(treeDataCopy, nodeId);
+        if (targetNode) {
+            targetNode.name = newValue.name;
+            targetNode.type = newValue.type;
+            setTreeData(treeDataCopy);
+            props.fetchData?.(treeDataCopy);
+        }
+        setAddFieldModalOpen(false);
     }
 
     const handleAddNode = (parentId: string, node: BasicNode) => {
@@ -85,6 +102,7 @@ const SchemaTreeComponent = (props: {
                         children: [...(child.children || []),
                             {
                                 ...newNode,
+                                // TODO: fix path generation in the end
                                 path: child.path + '.' + node.name,
                             }
                         ] as TreeNode[]
@@ -148,7 +166,13 @@ const SchemaTreeComponent = (props: {
             <span><MenuListComposition enabled={enabled}
                                        onAdd={() => {
                                            setAddFieldModalOpen(true);
-                                           setOriginalSchemaNode(node.id);
+                                           setOriginalSchemaNode(node);
+                                           setOnModify(false);
+                                       }}
+                                       onModify={() => {
+                                           setAddFieldModalOpen(true);
+                                           setOriginalSchemaNode(node);
+                                           setOnModify(true);
                                        }}
                                        onLink={() => {
                                            setLinkFieldModalOpen(true);
@@ -166,14 +190,17 @@ const SchemaTreeComponent = (props: {
             <AddFieldModal
                 open={addFieldModalOpen}
                 handleClose={() => setAddFieldModalOpen(false)}
-                handleAddField={handleAddField}
+                onAdd={handleAddField}
+
+                initialValues={originalSchemaNode ?? null}
+                onModify={onModify ? (v) => handleModifyNode(originalSchemaNode.id, v) : undefined}
             />
             <LinkFieldModal
                 treeData={props.linkedTreeData ?? []}
                 open={linkFieldModalOpen}
                 handleClose={() => setLinkFieldModalOpen(false)}
                 onConfirm={triggerLink}
-                schemaNode={originalSchemaNode}
+                schemaNode={originalSchemaNode.id}
                 modifySchemaNodePath={handleModifyNodePath}
             />
 
@@ -181,10 +208,11 @@ const SchemaTreeComponent = (props: {
             <div>
                 <TreeView
                     defaultExpanded={[]}
-                    onNodeSelect={(_, node) => {
+                    onNodeSelect={(_, id) => {
+                        const node = findNode(treeData, id) ?? {} as TreeNode;
                         setOriginalSchemaNode(node);
-                        props.setSelectedNode?.(node);
-                        props.setSelectedPath?.(findNode(treeData, node) ?? '');
+                        props.setSelectedNode?.(id);
+                        props.setSelectedPath?.(node.path);
 
                         console.log("Selected node", node)
                     }
