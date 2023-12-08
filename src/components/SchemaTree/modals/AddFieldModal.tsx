@@ -1,10 +1,10 @@
 import {Button, FormControl, FormControlLabel, Modal, Switch, TextField} from "@mui/material";
 import React from "react";
 
-import '../../pages/SchemaTree/SchemaTree.css';
+import '../../../pages/SchemaTree/SchemaTree.css';
 import {Form, FormikProvider, useFormik} from "formik";
-import {BasicNode} from "./TreeNode";
-import {modalStyle} from "../shared/ModalStyle";
+import {BasicNode} from "../TreeNode";
+import {modalStyle} from "../../shared/ModalStyle";
 
 const AddFieldModal = (props: {
     open: boolean,

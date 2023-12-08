@@ -1,8 +1,8 @@
 import {TreeItem, TreeView} from "@mui/x-tree-view";
 import React, {useEffect, useMemo} from "react";
 import {ChevronRight, ExpandMore} from "@mui/icons-material";
-import AddFieldModal from "./AddFieldModal";
-import LinkFieldModal from "./LinkFieldModal";
+import AddFieldModal from "./modals/AddFieldModal";
+import LinkFieldModal from "./modals/LinkFieldModal";
 import '../../pages/SchemaTree/SchemaTree.css';
 import {BasicNode, TreeNode} from "./TreeNode";
 import {DisplayNode} from "./DisplayNode";
@@ -15,6 +15,7 @@ const SchemaTreeComponent = (props: {
 
     setSelectedNode?: (nodeId: string) => void,
     setSelectedPath?: (path: string) => void,
+    disabled?: boolean,
 
     enableAddField?: boolean,
     enableLinkField?: boolean,
@@ -35,6 +36,18 @@ const SchemaTreeComponent = (props: {
     ]);
 
     const linageMap = useMemo(() => props.linageMap ?? new Map<string, string>(), [props.linageMap])
+
+    const getAllNodeIds = (nodes: TreeNode[]): string[] => {
+        const result: string[] = [];
+        const processNode = (node: TreeNode) => {
+            result.push(node.id);
+            if (node.children) {
+                node.children.forEach(processNode);
+            }
+        }
+        nodes.forEach(processNode);
+        return result;
+    }
 
     const findNode = (treeNodes: TreeNode[], targetId: string): TreeNode | null => {
         const processNode = (node: TreeNode): TreeNode | null => {
@@ -186,7 +199,10 @@ const SchemaTreeComponent = (props: {
 
     const renderTree = (node: TreeNode) => (
         <TreeItem
-            key={node.id} nodeId={node.id} label={<div className="tree-node-label">
+            key={node.id}
+            nodeId={node.id}
+            disabled={props.disabled ?? false}
+            label={<div className="tree-node-label">
             <DisplayNode node={node}/>
             {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
             <span><MenuListComposition enabled={enabled}
@@ -237,7 +253,7 @@ const SchemaTreeComponent = (props: {
             {/* A block for original schema */}
             <div>
                 <TreeView
-                    defaultExpanded={[]}
+                    defaultExpanded={getAllNodeIds(treeData)}
                     onNodeSelect={(_, id) => {
                         const node = findNode(treeData, id) ?? {} as TreeNode;
                         setOriginalSchemaNode(node);
