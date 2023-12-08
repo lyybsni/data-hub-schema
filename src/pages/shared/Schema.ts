@@ -5,6 +5,16 @@ export type Schema = {
     schema: any,
 }
 
+export type Field = {
+    name: string,
+    type: string,
+}
+
+export type SchemaResolve = {
+    name: string,
+    fields: Field[],
+}
+
 export const getSchema = async (schemaId: string) => {
     return await get(`/admin/schema/${schemaId}`);
 }
@@ -59,3 +69,11 @@ export const getMappingUnder = async (schemaId: string) => {
 export const getMapping = async (mappingId: string) => {
     return await get(`/admin/mapping/${mappingId}`);
 }
+
+export const uploadCSVFile = async(
+    file: File,
+) : Promise<Response> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return await post(`/admin/schema-from-csv`, formData, 'multipart/form-data');
+};

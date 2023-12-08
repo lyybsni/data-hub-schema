@@ -10,13 +10,13 @@ export const get = (url: string) => {
     }).then(res => res.json())
 }
 
-export const post = (url: string, data: any) => {
+export const post = (url: string, data: any, contentType?: string) => {
     return fetch(baseUrl + url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            ...(contentType ? {} : { 'Content-Type': 'application/json' }),
         },
-        body: JSON.stringify(data)
+        body: contentType ? data : JSON.stringify(data)
     })
 }
 

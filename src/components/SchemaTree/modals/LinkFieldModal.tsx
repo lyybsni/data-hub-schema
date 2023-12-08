@@ -8,8 +8,12 @@ import {css} from "@emotion/css";
 const LinkFieldModal = (props: {
     open: boolean,
     handleClose: () => void,
-
     treeData: TreeNode[],       // input schema for linkage
+
+    // TODO: implement this
+    onSubmit?: (nodeId: string, path: string) => void,
+
+    /* following are not useful */
     onConfirm: (nodeId: string) => string | null,      // add the link
     schemaNode: string,         // nodeId of the node to be modified
     modifySchemaNodePath: (nodeId: string, path: string) => void,
@@ -40,7 +44,6 @@ const LinkFieldModal = (props: {
             <TextField fullWidth value={props.mapKey ? rootMap.get(props.mapKey) : props.value} onChange={props.onChange}/>
         </FormControl>
     }
-
 
     const InheritPanel = () => {
         return (<div>
@@ -103,6 +106,9 @@ const LinkFieldModal = (props: {
     ]);
 
     const container = <div className={modalStyle}>
+        <div>
+            <h3>Link Field</h3>
+        </div>
         <div className={mainPanelStyle}>
         <div className={selectionPanelStyle}>
         <FormControl className='field'>

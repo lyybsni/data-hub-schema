@@ -2,9 +2,13 @@ import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import {ApplicantSchema} from "../../resource/ApplicantSchema";
 import React, {useEffect, useState} from "react";
 import {Button, FormControl, FormControlLabel, Input, Paper} from "@mui/material";
-import {jsonToSchemaTree, schemaTreeMappingToJson} from "../../components/SchemaTree/SchemaTreeFormatter";
+import {
+    fieldResolver,
+    jsonToSchemaTree,
+    schemaTreeMappingToJson
+} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {updateMapping} from "../shared/Schema";
+import {updateMapping, uploadCSVFile} from "../shared/Schema";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
@@ -29,19 +33,15 @@ const SchemaTreePage = () => {
 
 
     useEffect(() => {
-        console.log(files)
         if (files === '[{}]') {
-            console.log("IAM")
             return;
         }
-
         const initTreeNode: TreeNode = {
             id: 'root',
             name: 'root',
             path: 'root',
             children: []
         }
-
         const schema = JSON.parse(files)[0];
         jsonToSchemaTree(schema, initTreeNode);
         setTreeData(initTreeNode.children ?? []);
@@ -59,6 +59,18 @@ const SchemaTreePage = () => {
             setFiles(e.target?.result as string);
         };
     };
+
+    const handleUploadCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(e.target);
+        if (!e.target || !e.target.files) {
+            return false;
+        }
+        uploadCSVFile(e.target.files[0])
+            .then(res => res.json())
+            .then(data => {
+                setTreeData([fieldResolver(data)]);
+            });
+    }
 
     const getMappingBlob = () => {
         const processedExportedData = JSON.stringify(schemaTreeMappingToJson(exportData));
@@ -92,10 +104,20 @@ const SchemaTreePage = () => {
                         <FormControl>
                             <Button>
                                 <FormControlLabel control={<Input type="file"
+                                                                  id='csv-import'
+                                                                  name='csv-import'
+                                                                  style={{display: 'none'}}
+                                                                  onChange={handleChange}/>} label={'Load Schema in JSON'}
+                                                  htmlFor='csv-import'/>
+                            </Button>
+                        </FormControl>
+                        <FormControl>
+                            <Button>
+                                <FormControlLabel control={<Input type="file"
                                                                   id='import-schema'
                                                                   name='import-schema'
                                                                   style={{display: 'none'}}
-                                                                  onChange={handleChange}/>} label={'Load Schema in JSON'}
+                                                                  onChange={handleUploadCSV}/>} label={'Upload Sample Data (CSV)'}
                                                   htmlFor='import-schema'/>
                             </Button>
                         </FormControl>

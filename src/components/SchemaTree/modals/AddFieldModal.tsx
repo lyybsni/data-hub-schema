@@ -5,6 +5,7 @@ import '../../../pages/SchemaTree/SchemaTree.css';
 import {Form, FormikProvider, useFormik} from "formik";
 import {BasicNode} from "../TreeNode";
 import {modalStyle} from "../../shared/ModalStyle";
+import {css} from "@emotion/css";
 
 const AddFieldModal = (props: {
     open: boolean,
@@ -37,9 +38,11 @@ const AddFieldModal = (props: {
         }
     );
 
-    const container = <div className={modalStyle}>
+    const container =
+        <div className={modalStyle}>
+            <h3>Add a Field</h3>
         <FormikProvider value={formik}>
-            <Form onSubmit={formik.handleSubmit}>
+            <Form onSubmit={formik.handleSubmit} className={modalFieldStyle}>
                 <FormControl>
                     <FormControlLabel control={<Switch
                         id='isArray'
@@ -47,13 +50,13 @@ const AddFieldModal = (props: {
                         checked={formik.values.isArray}
                         onChange={formik.handleChange}/>} label={'Is Array?'}/>
                 </FormControl>
-                <TextField fullWidth type='text'
+                <TextField type='text'
                            id='name'
                            name='name'
                            value={formik.values.name}
                            onChange={formik.handleChange}
                            label='Attribute Name'/>
-                <TextField fullWidth type='text'
+                <TextField type='text'
                            id='type'
                            name='type'
                            value={formik.values.type}
@@ -78,5 +81,14 @@ const AddFieldModal = (props: {
     )
 
 }
+
+const modalFieldStyle = css`
+  display: flex;
+  flex-direction: column;
+  
+  div {
+    margin: 2px;
+  }
+`;
 
 export default AddFieldModal;
