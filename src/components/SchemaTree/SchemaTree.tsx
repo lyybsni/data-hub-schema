@@ -4,10 +4,11 @@ import {ChevronRight, ExpandMore} from "@mui/icons-material";
 import AddFieldModal from "./modals/AddFieldModal";
 import LinkFieldModal from "./modals/LinkFieldModal";
 import '../../pages/SchemaTree/SchemaTree.css';
-import {BasicNode, TreeNode} from "./TreeNode";
+import {BasicNode, Linage, TreeNode} from "./TreeNode";
 import {DisplayNode} from "./DisplayNode";
 import MenuListComposition from "../Menu/NodeMenu";
-
+import {stringifyLinage} from "./SchemaTreeFormatter";
+import {css} from "@emotion/css";
 
 const SchemaTreeComponent = (props: {
     initialTreeData?: TreeNode[],
@@ -23,7 +24,7 @@ const SchemaTreeComponent = (props: {
     setLinkSource?: (nodeId: string, linkedPath: string) => void,
 
     exportData?: (data: any[]) => void,
-    linageMap?: Map<string, string>,
+    linageMap?: Map<string, Linage>,
 }) => {
     // a container with a tree view of the schema
 
@@ -35,7 +36,7 @@ const SchemaTreeComponent = (props: {
         {id: '1', name: 'Input Root', children: [], path: 'root'} as TreeNode,
     ]);
 
-    const linageMap = useMemo(() => props.linageMap ?? new Map<string, string>(), [props.linageMap])
+    const linageMap = useMemo(() => props.linageMap ?? new Map<string, Linage>(), [props.linageMap])
 
     const getAllNodeIds = (nodes: TreeNode[]): string[] => {
         const result: string[] = [];
@@ -88,16 +89,16 @@ const SchemaTreeComponent = (props: {
         }
     }, [props.initialTreeData]);
 
-    const triggerLink = (nodeId: string) => {
-        const result = findNode(treeData, nodeId) ?? '';
-        console.log("I am here", nodeId, result);
-        if (result) {
-            const path = result.path;
-            props.setLinkSource?.(nodeId, path);
-            return path;
-        }
-        return null;
-    }
+    // const triggerLink = (nodeId: string) => {
+    //     const result = findNode(treeData, nodeId) ?? '';
+    //     console.log("I am here", nodeId, result);
+    //     if (result) {
+    //         const path = result.path;
+    //         props.setLinkSource?.(nodeId, path);
+    //         return path;
+    //     }
+    //     return null;
+    // }
 
     const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
@@ -160,31 +161,31 @@ const SchemaTreeComponent = (props: {
         props.fetchData?.(result);
     };
 
-    const handleModifyNodePath = (nodeId: string, newPath: string) => {
-        const modifyNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
-            return nodes.map((node) => {
-                if (node.id === nodeId) {
-                    linageMap.set(node.id, newPath);
-                    return node;
-                } else if (node.children) {
-                    return {...node, children: modifyNode(node.children)};
-                } else {
-                    return node;
-                }
-            });
-        };
+    // const handleModifyNodePath = (nodeId: string, newPath: string) => {
+    //     const modifyNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
+    //         return nodes.map((node) => {
+    //             if (node.id === nodeId) {
+    //                 linageMap.set(node.id, newPath);
+    //                 return node;
+    //             } else if (node.children) {
+    //                 return {...node, children: modifyNode(node.children)};
+    //             } else {
+    //                 return node;
+    //             }
+    //         });
+    //     };
+    //
+    //     const result = modifyNode(treeData)
+    //     retrievePathMapping(result);
+    // }
 
-        const result = modifyNode(treeData)
-        retrievePathMapping(result);
-    }
-
-    const retrievePathMapping = (data: TreeNode[]) => {
-        const result: any[] = [];
-        Array.from(linageMap.keys()).forEach((key) => {
-            result.push({key: key, value: linageMap.get(key)});
-        });
-        props.exportData?.(result);
-    }
+    // const retrievePathMapping = (data: TreeNode[]) => {
+    //     const result: any[] = [];
+    //     Array.from(linageMap.keys()).forEach((key) => {
+    //         result.push({key: key, value: linageMap.get(key)});
+    //     });
+    //     props.exportData?.(result);
+    // }
 
     /*** Components ***/
     const enabled = [] as string[];
@@ -203,28 +204,34 @@ const SchemaTreeComponent = (props: {
             nodeId={node.id}
             disabled={props.disabled ?? false}
             label={<div className="tree-node-label">
-            <DisplayNode node={node}/>
-            {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
-            <span><MenuListComposition enabled={enabled}
-                                       onAdd={() => {
-                                           setAddFieldModalOpen(true);
-                                           setOriginalSchemaNode(node);
-                                           setOnModify(false);
-                                       }}
-                                       onModify={() => {
-                                           setAddFieldModalOpen(true);
-                                           setOriginalSchemaNode(node);
-                                           setOnModify(true);
-                                       }}
-                                       onLink={() => {
-                                           setLinkFieldModalOpen(true);
-                                       }}
-                                       onDelete={() => {
-                                           // TODO: add a confirmation pop up
-                                           handleDeleteNode(node.id);
-                                       }}
-            /></span>
-        </div>}>
+                <DisplayNode node={node} extra={
+                    <span className={css`
+                      color: yellowgreen;
+                      font-style: italic;
+                      font-size: 0.5em;
+                    `}>{stringifyLinage(linageMap.get(node.path) ?? null)}</span>
+                }/>
+                {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
+                <span><MenuListComposition enabled={enabled}
+                                           onAdd={() => {
+                                               setAddFieldModalOpen(true);
+                                               setOriginalSchemaNode(node);
+                                               setOnModify(false);
+                                           }}
+                                           onModify={() => {
+                                               setAddFieldModalOpen(true);
+                                               setOriginalSchemaNode(node);
+                                               setOnModify(true);
+                                           }}
+                                           onLink={() => {
+                                               setLinkFieldModalOpen(true);
+                                           }}
+                                           onDelete={() => {
+                                               // TODO: add a confirmation pop up
+                                               handleDeleteNode(node.id);
+                                           }}
+                /></span>
+            </div>}>
             {Array.isArray(node.children) ? node.children.map((node) => renderTree(node)) : null}
         </TreeItem>
     );
@@ -245,9 +252,10 @@ const SchemaTreeComponent = (props: {
                 treeData={props.linkedTreeData ?? []}
                 open={linkFieldModalOpen}
                 handleClose={() => setLinkFieldModalOpen(false)}
-                onConfirm={triggerLink}
-                schemaNode={originalSchemaNode.id}
-                modifySchemaNodePath={handleModifyNodePath}
+
+                onSubmit={(linkInfo) => {
+                    linageMap.set(originalSchemaNode.path, linkInfo);
+                }}
             />
 
             {/* A block for original schema */}

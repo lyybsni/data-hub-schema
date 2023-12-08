@@ -2,12 +2,13 @@ import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import React, {useEffect} from "react";
 import {css} from "@emotion/css";
 import {getMapping, getMappingUnder, getSchemaList} from "../../pages/shared/Schema";
+import {Linage} from "../SchemaTree/TreeNode";
 
 export const SchemaSelection = (
     props: {
         setSelectedSchema: (schema: string) => void,
         setSelectedMapping: (mapping: string) => void,
-        setMappingData: (mapping: Map<string, string>) => void,
+        setMappingData: (mapping: Map<string, Linage>) => void,
 
         style?: any
     }
@@ -48,11 +49,10 @@ export const SchemaSelection = (
         }
         getMapping(selectedMapping).then(
             result => {
-                const data = new Map<string, string>();
+                const data = new Map<string, Linage>();
                 Array.from(JSON.parse(result.mapping)).forEach((item: any) => {
                     data.set(item.key, item.value);
                 });
-                console.log(result.mapping, data);
                 props.setMappingData(data);
             }
         )

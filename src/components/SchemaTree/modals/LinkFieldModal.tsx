@@ -1,7 +1,7 @@
 import {Button, FormControl, MenuItem, Modal, Select, TextField} from "@mui/material";
 import React, {ChangeEvent, useMemo} from "react";
 import SchemaTreeComponent from "../SchemaTree";
-import {TreeNode} from "../TreeNode";
+import {Linage, TreeNode} from "../TreeNode";
 import {modalStyle} from "../../shared/ModalStyle";
 import {css} from "@emotion/css";
 
@@ -9,17 +9,9 @@ const LinkFieldModal = (props: {
     open: boolean,
     handleClose: () => void,
     treeData: TreeNode[],       // input schema for linkage
-
-    // TODO: implement this
-    onSubmit?: (nodeId: string, path: string) => void,
-
-    /* following are not useful */
-    onConfirm: (nodeId: string) => string | null,      // add the link
-    schemaNode: string,         // nodeId of the node to be modified
-    modifySchemaNodePath: (nodeId: string, path: string) => void,
+    onSubmit?: (linkInfo: Linage) => void,
 }) => {
 
-    const [selectedPath, setSelectedPath] = React.useState('' as string);
     const [selectedKey, setSelectedKey] = React.useState('inherit' as string);
     const [selection, setSelection] = React.useState('inherit' as string);
     const [allowTreeRender, setAllowTreeRender] = React.useState(false);
@@ -76,11 +68,16 @@ const LinkFieldModal = (props: {
         </div>
     }
 
-    const RegexPanel = () => {
+    const RegexPanel = (
+        props: {
+            handleFromRegexChange: (e: ChangeEvent<HTMLTextAreaElement>) => void,
+            handleToRegexChange: (e: ChangeEvent<HTMLTextAreaElement>) => void,
+        }
+    ) => {
         return <div>
             <Panel labelText={'Field'} mapKey={'field'}/>
-            <Panel labelText={'From Regex'}/>
-            <Panel labelText={'To Regex'}/>
+            <Panel labelText={'From Regex'} onChange={props.handleFromRegexChange}/>
+            <Panel labelText={'To Regex'} onChange={props.handleToRegexChange}/>
         </div>
     }
 
@@ -92,17 +89,20 @@ const LinkFieldModal = (props: {
     }
 
     const handleSelectPath = (path: string) => {
-        setSelectedPath(path);
         setAllowTreeRender(false);
         rootMap.set(selectedKey, path);
     }
 
     const [expression, setExpression] = React.useState('');
+    const [fromRegex, setFromRegex] = React.useState('');
+    const [toRegex, setToRegex] = React.useState('');
 
     const showingPanelMap = new Map<string, React.ReactNode>([
         ['inherit', <InheritPanel/>],
         ['expression', <ExpressionPanel expression={expression} setExpression={setExpression}/>],
-        ['regex', <RegexPanel/>],
+        ['regex', <RegexPanel handleFromRegexChange={(e) => setFromRegex(e.target.value as string)}
+                              handleToRegexChange={(e) => setToRegex(e.target.value as string)}/>
+        ],
     ]);
 
     const container = <div className={modalStyle}>
@@ -135,7 +135,25 @@ const LinkFieldModal = (props: {
         </div>
         </div>
         <Button onClick={() => {
-            props.modifySchemaNodePath(props.schemaNode, selectedPath); // TODO: change this
+            const variables = new Map<string, string>();
+            const excludes = ['inherit', 'field'];
+            rootMap.forEach((value, key) => {
+                if (!excludes.includes(key)) {
+                    variables.set(`\${${key}}`, value);
+                }
+            });
+
+            props.onSubmit?.({
+                type: selection,
+                expression: expression,
+
+                inherit: rootMap.get('inherit'),
+                transform: rootMap.get('field'),    // TODO: change name
+                fromRegex: fromRegex,
+                toRegex: toRegex,
+                variables: variables,
+            });
+
             handleClose();
         }}>Link</Button>
     </div>;

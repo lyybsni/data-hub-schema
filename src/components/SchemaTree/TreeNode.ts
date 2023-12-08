@@ -12,3 +12,14 @@ export type TreeNode = {
     isArray?: boolean,
     children?: TreeNode[]
 };
+
+export type Linage = {
+    type?: string,
+    expression?: string,
+    inherit?: string,
+    transform?: string,    // TODO: change name
+    fromRegex?: string,
+    toRegex?: string,
+
+    variables?: Map<string, string>,
+}

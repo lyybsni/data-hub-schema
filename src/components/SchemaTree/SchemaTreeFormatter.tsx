@@ -1,4 +1,4 @@
-import {TreeNode} from "./TreeNode";
+import {Linage, TreeNode} from "./TreeNode";
 import {SchemaResolve} from "../../pages/shared/Schema";
 
 export const schemaTreeMappingToJson = (nodes: any[]) => {
@@ -27,6 +27,21 @@ export const fieldResolver = (schemaResolve: SchemaResolve) => {
     });
 
     return root;
+}
+
+export const stringifyLinage = (info: Linage | null) => {
+    console.log(info);
+    if (info?.inherit) {
+        return ` <- ${info?.inherit}`
+    } else if (info?.expression) {
+        const match = info?.expression.matchAll(/(?<=\${)\d+(?=})/g);
+        let copy = info.expression;
+        Array.from(match).forEach((item) => {
+            copy = copy.replaceAll(`${item.input}`, info?.variables?.get(item.input as string) ?? '');
+        });
+        return ` <- ${copy}`
+    }
+    return '';
 }
 
 

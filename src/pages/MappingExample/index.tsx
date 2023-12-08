@@ -14,6 +14,7 @@ import {PopOver} from "../../components/Menu/PopOverText";
 import {HelpOutlineRounded} from "@mui/icons-material";
 import {Hint} from "./Hint";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
+import {Linage} from "../../components/SchemaTree/TreeNode";
 
 export const MappingExample = () => {
 
@@ -23,7 +24,7 @@ export const MappingExample = () => {
 
 const [selectedSchema, setSelectedSchema] = React.useState('');
 const [selectedMapping, setSelectedMapping] = React.useState('' as string);
-const [mappingData, setMappingData] = React.useState(new Map<string, string>());
+const [mappingData, setMappingData] = React.useState(new Map<string, Linage>());
 
     const handleRawDataInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         if (e.target.value) {

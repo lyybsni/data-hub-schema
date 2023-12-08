@@ -9,7 +9,7 @@ import {
 } from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
 import {updateMapping, uploadCSVFile} from "../shared/Schema";
-import {TreeNode} from "../../components/SchemaTree/TreeNode";
+import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 
@@ -27,7 +27,7 @@ const SchemaTreePage = () => {
     const [selectedSchema, setSelectedSchema] = React.useState('');
     const [selectedMapping, setSelectedMapping] = React.useState('' as string);
 
-    const [mappingData, setMappingData] = React.useState(new Map<string, string>());
+    const [mappingData, setMappingData] = React.useState(new Map<string, Linage>());
 
     const [files, setFiles] = useState("[{}]");
 
