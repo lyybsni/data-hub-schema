@@ -70,14 +70,16 @@ const LinkFieldModal = (props: {
 
     const RegexPanel = (
         props: {
-            handleFromRegexChange: (e: ChangeEvent<HTMLTextAreaElement>) => void,
-            handleToRegexChange: (e: ChangeEvent<HTMLTextAreaElement>) => void,
+            fromRegex: string,
+            toRegex: string,
+            handleFromRegexChange: (str: string) => void,
+            handleToRegexChange: (str: string) => void,
         }
     ) => {
         return <div>
             <Panel labelText={'Field'} mapKey={'field'}/>
-            <Panel labelText={'From Regex'} onChange={props.handleFromRegexChange}/>
-            <Panel labelText={'To Regex'} onChange={props.handleToRegexChange}/>
+            <Panel labelText={'From Regex'} onChange={(e) => props.handleFromRegexChange(e.target.value)} value={fromRegex}/>
+            <Panel labelText={'To Regex'} onChange={(e) => props.handleToRegexChange(e.target.value)} value={toRegex}/>
         </div>
     }
 
@@ -100,8 +102,9 @@ const LinkFieldModal = (props: {
     const showingPanelMap = new Map<string, React.ReactNode>([
         ['inherit', <InheritPanel/>],
         ['expression', <ExpressionPanel expression={expression} setExpression={setExpression}/>],
-        ['regex', <RegexPanel handleFromRegexChange={(e) => setFromRegex(e.target.value as string)}
-                              handleToRegexChange={(e) => setToRegex(e.target.value as string)}/>
+        ['regex', <RegexPanel handleFromRegexChange={setFromRegex}
+                              handleToRegexChange={setToRegex}
+        fromRegex={fromRegex} toRegex={toRegex}/>
         ],
     ]);
 

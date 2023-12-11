@@ -1,14 +1,9 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
-import {ApplicantSchema} from "../../resource/ApplicantSchema";
-import React, {useEffect, useState} from "react";
-import {Button, FormControl, FormControlLabel, Input, Paper} from "@mui/material";
-import {
-    fieldResolver,
-    jsonToSchemaTree,
-    schemaTreeMappingToJson
-} from "../../components/SchemaTree/SchemaTreeFormatter";
+import React, {ReactElement, useEffect, useMemo, useState} from "react";
+import {Button, FormControl, FormControlLabel, Input, List, ListItem, Paper} from "@mui/material";
+import {fieldResolver, jsonToSchemaTree, stringifyLinage} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {updateMapping, uploadCSVFile} from "../shared/Schema";
+import {getSchema, updateMapping, uploadCSVFile} from "../shared/Schema";
 import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
@@ -22,7 +17,7 @@ const SchemaTreePage = () => {
     } as TreeNode];
 
     const [treeData, setTreeData] = React.useState(initTreeData as TreeNode[]);
-    const [exportData, setExportData] = React.useState([] as any[]);
+    const [schemaData, setSchemaData] = React.useState([] as any[]);
 
     const [selectedSchema, setSelectedSchema] = React.useState('');
     const [selectedMapping, setSelectedMapping] = React.useState('' as string);
@@ -47,6 +42,14 @@ const SchemaTreePage = () => {
         setTreeData(initTreeNode.children ?? []);
         // console.log(treeData, initTreeNode.children);
     }, [files, setTreeData]);
+
+    useEffect(() => {
+        if (selectedSchema)
+            getSchema(selectedSchema).then((res) => {
+                const target = JSON.parse(res.schema);
+                setSchemaData(target);
+            });
+    }, [selectedSchema]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target || !e.target.files) {
@@ -73,7 +76,7 @@ const SchemaTreePage = () => {
     }
 
     const getMappingBlob = () => {
-        const processedExportedData = JSON.stringify(schemaTreeMappingToJson(exportData));
+        const processedExportedData = JSON.stringify(mappingData);
         return saveFile(
             new Blob([processedExportedData], {type: 'application/json'}),
             "mapping.json"
@@ -85,6 +88,18 @@ const SchemaTreePage = () => {
         return saveFile(new Blob([processedExportedData], {type: 'application/json'}),
             "schema.json");
     }
+
+    const DisplayLinage = useMemo(() => {
+        const result = [] as ReactElement[]
+        mappingData.forEach((value, key) => {
+            if (value)
+            result.push(<ListItem>
+                <div>{key}</div>
+                <div>{stringifyLinage(value)}</div>
+            </ListItem>)
+        });
+        return result;
+    }, [mappingData]);
 
     return (
             <div className={containerStyle}>
@@ -138,21 +153,28 @@ const SchemaTreePage = () => {
                                      setSelectedMapping={setSelectedMapping}
                                     setMappingData={setMappingData}/>
 
-                    <SchemaTreeComponent
-                        initialTreeData={[ApplicantSchema]}
-                        linkedTreeData={treeData}
-                        enableAddField={false}
-                        enableLinkField={true}
-                        linageMap={mappingData}
-                        exportData={(data) => {
-                            setExportData(data);
-                            console.log(data);
-                        }}
-                    />
+                    <div className={schemaMappingStyle}>
+                        <SchemaTreeComponent
+                            initialTreeData={schemaData}
+                            linkedTreeData={treeData}
+                            enableAddField={false}
+                            enableLinkField={true}
+                            linageMap={mappingData}
+                            exportData={setMappingData}
+                        />
+                        <div className={css`max-width: 30%; font-size: 10px`}>
+                            <List>
+                                {DisplayLinage}
+                            </List>
+                        </div>
+                    </div>
 
                     <div className="button-group">
                         <Button onClick={getMappingBlob}>Export Mapping</Button>
-                        <Button onClick={() => updateMapping(selectedSchema, JSON.stringify(exportData))}>Save Mapping</Button>
+                        <Button onClick={() => {
+                            updateMapping(selectedSchema, Object.fromEntries(mappingData));
+                            console.log('aaa', (mappingData));
+                        }}>Save Mapping</Button>
                     </div>
                 </Paper>
             </div>
@@ -199,6 +221,13 @@ const rightContainerStyle = css`
   flex-direction: column;
   width: 60%;
 `;
+
+const schemaMappingStyle = css`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 10px 0 10px;
+`
 
 
 export default SchemaTreePage;

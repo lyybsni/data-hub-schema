@@ -50,13 +50,14 @@ export const SchemaSelection = (
         getMapping(selectedMapping).then(
             result => {
                 const data = new Map<string, Linage>();
-                Array.from(JSON.parse(result.mapping)).forEach((item: any) => {
-                    data.set(item.key, item.value);
+                result.mapping.forEach((item: any) => {
+                    data.set(item.path, {...item});
+                    console.log(item)
                 });
                 props.setMappingData(data);
             }
         )
-    }, [props, selectedMapping]);
+    }, [selectedMapping]);
 
     return (<div className={props.style ?? schemaSelectionStyle}>
         <FormControl className="schema-selection">

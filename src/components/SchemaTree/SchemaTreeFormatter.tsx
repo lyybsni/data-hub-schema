@@ -29,7 +29,7 @@ export const fieldResolver = (schemaResolve: SchemaResolve) => {
     return root;
 }
 
-export const stringifyLinage = (info: Linage | null) => {
+export const stringifyLinage = (info?: Linage) => {
     console.log(info);
     if (info?.inherit) {
         return ` <- ${info?.inherit}`
@@ -40,6 +40,8 @@ export const stringifyLinage = (info: Linage | null) => {
             copy = copy.replaceAll(`${item.input}`, info?.variables?.get(item.input as string) ?? '');
         });
         return ` <- ${copy}`
+    } else if (info?.transform) {
+        return ` <- ${info.transform} : ${info.fromRegex} -> ${info.toRegex}`
     }
     return '';
 }

@@ -23,7 +23,7 @@ const SchemaTreeComponent = (props: {
     fetchData?: (nodes: TreeNode[]) => void,
     setLinkSource?: (nodeId: string, linkedPath: string) => void,
 
-    exportData?: (data: any[]) => void,
+    exportData?: (data: Map<string, Linage>) => void,
     linageMap?: Map<string, Linage>,
 }) => {
     // a container with a tree view of the schema
@@ -161,32 +161,6 @@ const SchemaTreeComponent = (props: {
         props.fetchData?.(result);
     };
 
-    // const handleModifyNodePath = (nodeId: string, newPath: string) => {
-    //     const modifyNode: (nodes: TreeNode[]) => TreeNode[] = (nodes: TreeNode[]) => {
-    //         return nodes.map((node) => {
-    //             if (node.id === nodeId) {
-    //                 linageMap.set(node.id, newPath);
-    //                 return node;
-    //             } else if (node.children) {
-    //                 return {...node, children: modifyNode(node.children)};
-    //             } else {
-    //                 return node;
-    //             }
-    //         });
-    //     };
-    //
-    //     const result = modifyNode(treeData)
-    //     retrievePathMapping(result);
-    // }
-
-    // const retrievePathMapping = (data: TreeNode[]) => {
-    //     const result: any[] = [];
-    //     Array.from(linageMap.keys()).forEach((key) => {
-    //         result.push({key: key, value: linageMap.get(key)});
-    //     });
-    //     props.exportData?.(result);
-    // }
-
     /*** Components ***/
     const enabled = [] as string[];
     if (props.enableAddField) {
@@ -198,6 +172,7 @@ const SchemaTreeComponent = (props: {
         enabled.push('link');
     }
 
+    // TODO: there is bug in infinite loop
     const renderTree = (node: TreeNode) => (
         <TreeItem
             key={node.id}
@@ -209,7 +184,7 @@ const SchemaTreeComponent = (props: {
                       color: yellowgreen;
                       font-style: italic;
                       font-size: 0.5em;
-                    `}>{stringifyLinage(linageMap.get(node.path) ?? null)}</span>
+                    `}>{linageMap.has(node.path) && linageMap.get(node.path) ? stringifyLinage(linageMap.get(node.path)) : ''}</span>
                 }/>
                 {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
                 <span><MenuListComposition enabled={enabled}
@@ -255,6 +230,7 @@ const SchemaTreeComponent = (props: {
 
                 onSubmit={(linkInfo) => {
                     linageMap.set(originalSchemaNode.path, linkInfo);
+                    props.exportData?.(linageMap);
                 }}
             />
 
