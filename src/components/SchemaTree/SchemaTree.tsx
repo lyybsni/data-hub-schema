@@ -9,6 +9,7 @@ import {DisplayNode} from "./DisplayNode";
 import MenuListComposition from "../Menu/NodeMenu";
 import {stringifyLinage} from "./SchemaTreeFormatter";
 import {css} from "@emotion/css";
+import {ConfirmDataPopup} from "../Menu/DataPopup";
 
 const SchemaTreeComponent = (props: {
     initialTreeData?: TreeNode[],
@@ -89,17 +90,6 @@ const SchemaTreeComponent = (props: {
         }
     }, [props.initialTreeData]);
 
-    // const triggerLink = (nodeId: string) => {
-    //     const result = findNode(treeData, nodeId) ?? '';
-    //     console.log("I am here", nodeId, result);
-    //     if (result) {
-    //         const path = result.path;
-    //         props.setLinkSource?.(nodeId, path);
-    //         return path;
-    //     }
-    //     return null;
-    // }
-
     const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
         handleAddNode(originalSchemaNode.id, node);
@@ -173,6 +163,9 @@ const SchemaTreeComponent = (props: {
     }
 
     // TODO: there is bug in infinite loop
+    const [confirmDelete, setConfirmDelete] = React.useState(false);
+    const [handleNodeDelete, setHandleNodeDelete] = React.useState<(() => void) | undefined>(undefined);
+
     const renderTree = (node: TreeNode) => (
         <TreeItem
             key={node.id}
@@ -204,6 +197,8 @@ const SchemaTreeComponent = (props: {
                                            onDelete={() => {
                                                // TODO: add a confirmation pop up
                                                handleDeleteNode(node.id);
+                                               // setConfirmDelete(true);
+                                               // setHandleNodeDelete(() => handleDeleteNode(node.id));
                                            }}
                 /></span>
             </div>}>
@@ -219,11 +214,10 @@ const SchemaTreeComponent = (props: {
                 open={addFieldModalOpen}
                 handleClose={() => setAddFieldModalOpen(false)}
                 onAdd={handleAddField}
-
                 initialValues={originalSchemaNode ?? null}
                 onModify={onModify ? (v) => handleModifyNode(originalSchemaNode.id, v) : undefined}
             /> : <div/>}
-            <LinkFieldModal
+            {linkFieldModalOpen ? <LinkFieldModal
                 treeData={props.linkedTreeData ?? []}
                 open={linkFieldModalOpen}
                 handleClose={() => setLinkFieldModalOpen(false)}
@@ -232,7 +226,8 @@ const SchemaTreeComponent = (props: {
                     linageMap.set(originalSchemaNode.path, linkInfo);
                     props.exportData?.(linageMap);
                 }}
-            />
+            /> : <div/>}
+            <ConfirmDataPopup data={"Are you sure to delete this node with its children?"} open={confirmDelete} setOpen={setConfirmDelete} onDelete={handleNodeDelete}/>
 
             {/* A block for original schema */}
             <div>

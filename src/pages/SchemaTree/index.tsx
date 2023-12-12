@@ -1,12 +1,13 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
 import React, {ReactElement, useEffect, useMemo, useState} from "react";
-import {Button, FormControl, FormControlLabel, Input, List, ListItem, Paper} from "@mui/material";
+import {Button, FormControl, FormControlLabel, Input, ListItem, Paper} from "@mui/material";
 import {fieldResolver, jsonToSchemaTree, stringifyLinage} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
 import {getSchema, updateMapping, uploadCSVFile} from "../shared/Schema";
 import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
+import {DataPopup} from "../../components/Menu/DataPopup";
 
 const SchemaTreePage = () => {
     const initTreeData = [{
@@ -25,6 +26,7 @@ const SchemaTreePage = () => {
     const [mappingData, setMappingData] = React.useState(new Map<string, Linage>());
 
     const [files, setFiles] = useState("[{}]");
+    const [displayLinage, setDisplayLinage] = useState(false);
 
 
     useEffect(() => {
@@ -162,18 +164,18 @@ const SchemaTreePage = () => {
                             linageMap={mappingData}
                             exportData={setMappingData}
                         />
-                        <div className={css`max-width: 30%; font-size: 10px`}>
-                            <List>
-                                {DisplayLinage}
-                            </List>
-                        </div>
                     </div>
 
+                    <DataPopup
+                    data={DisplayLinage}
+                    open={displayLinage}
+                    setOpen={setDisplayLinage}/>
+
                     <div className="button-group">
+                        <Button onClick={() => setDisplayLinage(true)}>Show Rule Information</Button>
                         <Button onClick={getMappingBlob}>Export Mapping</Button>
                         <Button onClick={() => {
-                            updateMapping(selectedSchema, Object.fromEntries(mappingData));
-                            console.log('aaa', (mappingData));
+                            updateMapping(selectedSchema, Object.fromEntries(mappingData)).then(r => console.log(r));
                         }}>Save Mapping</Button>
                     </div>
                 </Paper>

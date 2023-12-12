@@ -10,6 +10,7 @@ const LinkFieldModal = (props: {
     handleClose: () => void,
     treeData: TreeNode[],       // input schema for linkage
     onSubmit?: (linkInfo: Linage) => void,
+    input?: boolean
 }) => {
 
     const [selectedKey, setSelectedKey] = React.useState('inherit' as string);
@@ -23,17 +24,34 @@ const LinkFieldModal = (props: {
     const Panel = (props: {
         labelText: string,
         value?: string,
-        beforeSelection?: () => void,
+
         onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void,
         mapKey?: string,
+        input?: boolean
     }) => {
+
+        const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+            rootMap.set(props.mapKey as string, e.target.value);
+            setValue(e.target.value);
+            props.onChange?.(e);
+        }
+        
+        const getValue = () => {
+            if (props.mapKey) {
+                return rootMap.get(props.mapKey);
+            } else {
+                return props.value;
+            }
+        }
+
+        const [value, setValue] = React.useState(getValue() ?? '');
+
         return <FormControl className='field' onSelect={() => {
-            props.beforeSelection?.();
-            handleSelection(props.mapKey ?? '');
+            if (props.mapKey && (!props.input)) handleSelection(props.mapKey);
         }
         }>
             <label>{props.labelText}</label>
-            <TextField fullWidth value={props.mapKey ? rootMap.get(props.mapKey) : props.value} onChange={props.onChange}/>
+            <TextField fullWidth value={value} onChange={handleChange}/>
         </FormControl>
     }
 
@@ -43,43 +61,30 @@ const LinkFieldModal = (props: {
         </div>)
     }
 
-    const ExpressionPanel = (
-        props: {
-            expression: string,
-            setExpression:(str: string) => void,
-        }
-    ) => {
-        const [expression, setExpression] = React.useState(props.expression);
+    const ExpressionPanel = (props: {
+        expression: string
+    }) => {
+
+        const expression = props.expression;
 
         const expressionList = useMemo(() => {
             const match = Array.from(expression.matchAll(/(?<=\${)\d+(?=})/g));
             return match.map(m => {
-                return <Panel labelText={m.toString()} mapKey={m.toString()} beforeSelection={() => props.setExpression(expression)}/>
+                return <Panel labelText={m.toString()} mapKey={m.toString()}/>
             });
-        }, [expression, props]);
-
-        const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            setExpression(e.target.value);
-        }
+        }, [expression]);
 
         return <div>
-            <Panel labelText={'Expression'} value={expression} onChange={handleChange}/>
+            <Panel labelText={'Expression'} mapKey={'expression'} input={true}/>
             {expressionList}
         </div>
     }
 
-    const RegexPanel = (
-        props: {
-            fromRegex: string,
-            toRegex: string,
-            handleFromRegexChange: (str: string) => void,
-            handleToRegexChange: (str: string) => void,
-        }
-    ) => {
+    const RegexPanel = () => {
         return <div>
-            <Panel labelText={'Field'} mapKey={'field'}/>
-            <Panel labelText={'From Regex'} onChange={(e) => props.handleFromRegexChange(e.target.value)} value={fromRegex}/>
-            <Panel labelText={'To Regex'} onChange={(e) => props.handleToRegexChange(e.target.value)} value={toRegex}/>
+            <Panel labelText={'Field'} mapKey={'regex'}/>
+            <Panel labelText={'From Regex'} mapKey={'fromRegex'} input={true}/>
+            <Panel labelText={'To Regex'} mapKey={'toRegex'} input={true}/>
         </div>
     }
 
@@ -95,16 +100,10 @@ const LinkFieldModal = (props: {
         rootMap.set(selectedKey, path);
     }
 
-    const [expression, setExpression] = React.useState('');
-    const [fromRegex, setFromRegex] = React.useState('');
-    const [toRegex, setToRegex] = React.useState('');
-
     const showingPanelMap = new Map<string, React.ReactNode>([
         ['inherit', <InheritPanel/>],
-        ['expression', <ExpressionPanel expression={expression} setExpression={setExpression}/>],
-        ['regex', <RegexPanel handleFromRegexChange={setFromRegex}
-                              handleToRegexChange={setToRegex}
-        fromRegex={fromRegex} toRegex={toRegex}/>
+        ['expression', <ExpressionPanel expression={rootMap.get('expression') as string ?? ''}/>],
+        ['regex', <RegexPanel/>
         ],
     ]);
 
@@ -113,29 +112,32 @@ const LinkFieldModal = (props: {
             <h3>Link Field</h3>
         </div>
         <div className={mainPanelStyle}>
-        <div className={selectionPanelStyle}>
-        <FormControl className='field'>
-            <label>Link Type</label>
-            <Select
-                onChange={e => setSelection(e.target.value as string)}
-                fullWidth
-            >
-                <MenuItem value='inherit'>Direct Inherit</MenuItem>
-                <MenuItem value='expression'>Expression</MenuItem>
-                <MenuItem value='regex'>Regex</MenuItem>
-            </Select>
-        </FormControl>
+            <div className={selectionPanelStyle}>
+                <FormControl className='field'>
+                    <label>Link Type</label>
+                    <Select
+                        onChange={e => setSelection(e.target.value as string)}
+                        fullWidth
+                        defaultValue='inherit'
+                    >
+                        <MenuItem value='inherit'>Direct Inherit</MenuItem>
+                        <MenuItem value='expression'>Expression</MenuItem>
+                        <MenuItem value='regex'>Regex</MenuItem>
+                        <MenuItem value='enum'>Enumeration Mapping</MenuItem>
+                        <MenuItem value='array'>Array Aggregation (Only for Leaves)</MenuItem>
+                    </Select>
+                </FormControl>
 
-        {showingPanelMap.get(selection)}
-        </div>
+                {showingPanelMap.get(selection)}
+            </div>
 
-        <div>
-        <SchemaTreeComponent
-            initialTreeData={props.treeData}
-            setSelectedPath={handleSelectPath}
-            disabled={!allowTreeRender}
-            />
-        </div>
+            <div>
+                <SchemaTreeComponent
+                    initialTreeData={props.treeData}
+                    setSelectedPath={handleSelectPath}
+                    disabled={!allowTreeRender}
+                />
+            </div>
         </div>
         <Button onClick={() => {
             const variables = new Map<string, string>();
@@ -148,12 +150,11 @@ const LinkFieldModal = (props: {
 
             props.onSubmit?.({
                 type: selection,
-                expression: expression,
-
+                expression: rootMap.get('expression'),
                 inherit: rootMap.get('inherit'),
-                transform: rootMap.get('field'),    // TODO: change name
-                fromRegex: fromRegex,
-                toRegex: toRegex,
+                transform: rootMap.get('regex'),    // TODO: change name
+                fromRegex: rootMap.get('fromRegex'),
+                toRegex: rootMap.get('toRegex'),
                 variables: variables,
             });
 
@@ -162,7 +163,6 @@ const LinkFieldModal = (props: {
     </div>;
 
     const handleClose = () => {
-        setExpression('');
         rootMap.clear();
         props.handleClose();
     }
@@ -174,16 +174,16 @@ const LinkFieldModal = (props: {
 
 const mainPanelStyle = css`
   display: flex;
-    flex-direction: row;
-  
+  flex-direction: row;
+
   .field {
-    width:90%;
+    width: 90%;
     margin: auto;
   }
 `;
 
 const selectionPanelStyle = css`
-    width: 50%;
+  width: 50%;
 `;
 
 export default LinkFieldModal;

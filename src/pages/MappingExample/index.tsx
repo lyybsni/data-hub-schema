@@ -17,6 +17,7 @@ import {Hint} from "./Hint";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 import {Linage} from "../../components/SchemaTree/TreeNode";
 import {trailRun} from "../shared/Convert";
+import { DataPopup } from "../../components/Menu/DataPopup";
 
 export const MappingExample = () => {
 
@@ -46,8 +47,14 @@ export const MappingExample = () => {
             });
     }
 
+    const [informationPopupOpen, setInformationPopupOpen] = React.useState(false);
+    const [information, setInformation] = React.useState('');
+
     return (
         <div className={mappingExampleStyle}>
+
+            <DataPopup open={informationPopupOpen} setOpen={setInformationPopupOpen} data={information}/>
+
             <Paper className={exampleDataAreaStyle}>
                 <div>
                     <h3>Example Data</h3>
@@ -93,9 +100,18 @@ export const MappingExample = () => {
                   }
                 }`}>
                     <ListItem><Button onClick={handleSubmit}>Go!</Button></ListItem>
-                    <ListItem><Button>Check Original Schema</Button></ListItem>
-                    <ListItem><Button>Check Target Schema</Button></ListItem>
-                    <ListItem><Button>Check Mapping Rules</Button></ListItem>
+                    <ListItem><Button onClick={() => {
+                        setInformationPopupOpen(true);
+                        setInformation(JSON.stringify(selectedSchema));
+                    }}>Check Original Schema</Button></ListItem>
+                    <ListItem><Button onClick={() => {
+                        setInformationPopupOpen(true);
+                        setInformation(JSON.stringify(selectedSchema));
+                    }}>Check Target Schema</Button></ListItem>
+                    <ListItem><Button onClick={() => {
+                        setInformationPopupOpen(true);
+                        setInformation(JSON.stringify(selectedMapping));
+                    }}>Check Mapping Rules</Button></ListItem>
                 </List>
             </Paper>
             <Paper className={resultDataAreaStyle}>

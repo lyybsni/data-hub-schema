@@ -6,6 +6,7 @@ import {Form, FormikProvider, useFormik} from "formik";
 import {BasicNode} from "../TreeNode";
 import {modalStyle} from "../../shared/ModalStyle";
 import {css} from "@emotion/css";
+import {ConfirmDataPopup} from "../../Menu/DataPopup";
 
 const AddFieldModal = (props: {
     open: boolean,
@@ -15,6 +16,7 @@ const AddFieldModal = (props: {
     initialValues?: BasicNode,
     onModify?: ((newNode: BasicNode) => void) | undefined
 }) => {
+
     const formik = useFormik(
         {
             initialValues: (props.onModify && props.initialValues) ? {
@@ -30,7 +32,12 @@ const AddFieldModal = (props: {
                 if (!props.onModify) {
                     props.onAdd( node);
                 } else {
-                    props.onModify(node);
+                    // TODO: not working
+                    setData("Are you sure to modify this node?");
+                    setConfirmOpen(true);
+                    setOnConfirm(() => {
+                        props.onModify?.(node)
+                    });
                 }
                 formik.resetForm();
             },
@@ -38,9 +45,16 @@ const AddFieldModal = (props: {
         }
     );
 
+    const [confirmOpen, setConfirmOpen] = React.useState(false);
+    const [data, setData] = React.useState('');
+    const [onConfirm, setOnConfirm] = React.useState<(() => void) | undefined>(undefined);
+
     const container =
         <div className={modalStyle}>
             <h3>Add a Field</h3>
+            <ConfirmDataPopup open={confirmOpen} setOpen={setConfirmOpen} data={data} onDelete={() => {
+                onConfirm?.();
+            }}/>
         <FormikProvider value={formik}>
             <Form onSubmit={formik.handleSubmit} className={modalFieldStyle}>
                 <FormControl>
