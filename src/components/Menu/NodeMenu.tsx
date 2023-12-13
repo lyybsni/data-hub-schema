@@ -15,6 +15,7 @@ export default function MenuListComposition(
         onModify?: () => void,
         onDelete?: () => void,
         onLink?: () => void,
+        onDeleteLink? : () => void,
         color?: 'inherit' | 'primary' | 'secondary' | 'action' | 'disabled' | 'error' | undefined,
     }
 ) {
@@ -56,6 +57,11 @@ export default function MenuListComposition(
         handleClose(event);
     }
 
+    const handleDeleteLink = (event: Event | React.SyntheticEvent) => {
+        props.onDeleteLink?.();
+        handleClose(event);
+    }
+
     function handleListKeyDown(event: React.KeyboardEvent) {
         if (event.key === 'Tab') {
             event.preventDefault();
@@ -86,6 +92,8 @@ export default function MenuListComposition(
                 itemList.push(<MenuItem key={item} onClick={handleDelete}>Delete</MenuItem>);
             } else if (item === 'link') {
                 itemList.push(<MenuItem key={item} onClick={handleLink}>Link</MenuItem>);
+            } else if (item === 'delete-link') {
+                itemList.push(<MenuItem key={item} onClick={handleDeleteLink}>Delete Link</MenuItem>);
             }
         });
         return itemList;

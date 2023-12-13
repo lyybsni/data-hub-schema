@@ -1,5 +1,5 @@
 import {TreeItem, TreeView} from "@mui/x-tree-view";
-import React, {useEffect, useMemo} from "react";
+import React, {useCallback, useEffect, useMemo} from "react";
 import {ChevronRight, ExpandMore} from "@mui/icons-material";
 import AddFieldModal from "./modals/AddFieldModal";
 import LinkFieldModal from "./modals/LinkFieldModal";
@@ -83,12 +83,17 @@ const SchemaTreeComponent = (props: {
         return result.length > 0 ? result[0] : null;
     }
 
+    const handleDeleteLink = useCallback((path: string) => {
+        linageMap.delete(path);
+        props.exportData?.(linageMap);
+    }, [linageMap, props]);
+    
     // TODO: fix the linking problem
     useEffect(() => {
         if (props.initialTreeData) {
             setTreeData(props.initialTreeData)
         }
-    }, [props.initialTreeData]);
+    }, [props.initialTreeData, handleDeleteLink]);
 
     const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
@@ -151,6 +156,8 @@ const SchemaTreeComponent = (props: {
         props.fetchData?.(result);
     };
 
+    
+
     /*** Components ***/
     const enabled = [] as string[];
     if (props.enableAddField) {
@@ -160,6 +167,7 @@ const SchemaTreeComponent = (props: {
     }
     if (props.enableLinkField) {
         enabled.push('link');
+        enabled.push('delete-link')
     }
 
     // TODO: there is bug in infinite loop
@@ -201,9 +209,10 @@ const SchemaTreeComponent = (props: {
                                                                                            onDelete={() => {
                                                // TODO: add a confirmation pop up
                                                handleDeleteNode(node.id);
-                                               // setConfirmDelete(true);
-                                               // setHandleNodeDelete(() => handleDeleteNode(node.id));
                                            }}
+                                         onDeleteLink={() => {
+                                             handleDeleteLink(node.path);
+                                         }}
                 /></span>
             </div>}>
             {Array.isArray(node.children) ? node.children.map((node) => renderTree(node)) : null}
