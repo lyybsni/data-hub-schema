@@ -65,16 +65,21 @@ const SchemaTreePage = () => {
         };
     };
 
+    const handleClick = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+        e.currentTarget.value = '';
+    }
+
     const handleUploadJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log(e.target);
         if (!e.target || !e.target.files) {
             return false;
         }
-        // TODO
         uploadJSONExample(e.target.files[0])
             .then(res => res.json())
             .then(data => {
                 setTreeData([fieldResolver(data)]);
+                // TODO: check if this is the correct way to clear the file input
+                e.target.value = '';
             });
     }
     const handleUploadCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,6 +141,7 @@ const SchemaTreePage = () => {
                                                                   id='json-sample'
                                                                   name='json-sample'
                                                                   style={{display: 'none'}}
+                                                                  onClick={handleClick}
                                                                   onChange={handleUploadJSON}/>} label={'Upload Sample Data (JSON)'}
                                                   htmlFor='json-sample'/>
                             </Button>
@@ -146,6 +152,7 @@ const SchemaTreePage = () => {
                                                                   id='csv-sample'
                                                                   name='csv-sample'
                                                                   style={{display: 'none'}}
+                                                                  onClick={handleClick}
                                                                   onChange={handleUploadCSV}/>} label={'Upload Sample Data (CSV)'}
                                                   htmlFor='csv-sample'/>
                             </Button>
@@ -175,7 +182,9 @@ const SchemaTreePage = () => {
 
                     <SchemaSelection setSelectedSchema={setSelectedSchema}
                                      setSelectedMapping={setSelectedMapping}
-                                    setMappingData={setMappingData}/>
+                                    setMappingData={setMappingData}
+                        selectedMapping={selectedMapping}
+                    />
 
                     <div className={schemaMappingStyle}>
                         <SchemaTreeComponent
@@ -197,7 +206,7 @@ const SchemaTreePage = () => {
                         <Button onClick={() => setDisplayLinage(true)}>Show Rule Information</Button>
                         <Button onClick={() => {
                             setMappingData(new Map<string, Linage>());
-                            // setSelectedMapping('');
+                            setSelectedMapping('');
                         }}>Clear Mapping</Button>
                         <Button onClick={getMappingBlob}>Export Mapping</Button>
                         <Button onClick={() => {

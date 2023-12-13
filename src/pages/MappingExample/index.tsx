@@ -93,6 +93,7 @@ export const MappingExample = () => {
                                  setSelectedMapping={setSelectedMapping}
                                  setMappingData={setMappingData}
                                  style={selectionOverrideStyle}
+                                 allowCreateMapping={false}
                 />
                 <List className={css`li {
                   button {
@@ -110,7 +111,7 @@ export const MappingExample = () => {
                     }}>Check Target Schema</Button></ListItem>
                     <ListItem><Button onClick={() => {
                         setInformationPopupOpen(true);
-                        setInformation(JSON.stringify(selectedMapping));
+                        setInformation(JSON.stringify(mappingData));
                     }}>Check Mapping Rules</Button></ListItem>
                 </List>
             </Paper>
