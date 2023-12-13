@@ -1,5 +1,6 @@
 import {Button, Dialog} from "@mui/material"
 import {ReactElement} from "react";
+import {css} from "@emotion/css";
 
 export const DataPopup = (props: {
     data: ReactElement | ReactElement[] | string,
@@ -8,11 +9,9 @@ export const DataPopup = (props: {
 }) => {
 
     return (
-        <Dialog open={props.open ?? false} onClose={() => props.setOpen?.(false)}>
-            <div className='data-popup'>
-                <pre>
-                    {props.data}
-                </pre>
+        <Dialog open={props.open ?? false} onClose={() => props.setOpen?.(false)} className={dialogStyle}>
+            <div>
+                {props.data}
             </div>
         </Dialog>
     )
@@ -28,7 +27,7 @@ export const ConfirmDataPopup = (props: {
 
     return (
         <Dialog open={props.open ?? false} onClose={() => props.setOpen?.(false)}>
-            <div className='data-popup'>
+            <div>
                 <span>
                     {props.data}
                 </span>
@@ -42,3 +41,9 @@ export const ConfirmDataPopup = (props: {
         </Dialog>
     )
 }
+
+const dialogStyle = css`
+  width: 50%;
+  height: 50%;
+  margin: auto ;
+    `;

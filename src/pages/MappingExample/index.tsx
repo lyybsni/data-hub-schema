@@ -2,6 +2,7 @@ import {
     Button,
     FormControl,
     FormControlLabel,
+    Input,
     InputLabel,
     List,
     ListItem,
@@ -17,7 +18,7 @@ import {Hint} from "./Hint";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 import {Linage} from "../../components/SchemaTree/TreeNode";
 import {trailRun} from "../shared/Convert";
-import { DataPopup } from "../../components/Menu/DataPopup";
+import {DataPopup} from "../../components/Menu/DataPopup";
 
 export const MappingExample = () => {
 
@@ -29,6 +30,9 @@ export const MappingExample = () => {
     const [selectedMapping, setSelectedMapping] = React.useState('' as string);
     const [mappingData, setMappingData] = React.useState(new Map<string, Linage>());
 
+    const [uploadFileName, setUploadFileName] = React.useState('' as string);
+    const [onProduction, setOnProduction] = React.useState(false as boolean);
+
     const [displayData, setDisplayData] = React.useState('');
 
     const handleRawDataInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -37,6 +41,7 @@ export const MappingExample = () => {
             setRawData(e.target.value);
         } else {
             setShrink(false);
+            setRawData('');
         }
     }
 
@@ -48,23 +53,75 @@ export const MappingExample = () => {
     }
 
     const [informationPopupOpen, setInformationPopupOpen] = React.useState(false);
-    const [information, setInformation] = React.useState('');
+    const [information, setInformation] = React.useState(null as any);
+
+    const handleClick = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+        e.currentTarget.value = '';
+    }
+
+    const uploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(e.target);
+        if (!e.target || !e.target.files) {
+            return false;
+        }
+        setUploadFileName(e.target.files[0].name);
+        // uploadJSONExample(e.target.files[0])
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         // setTreeData([fieldResolver(data)]);
+        //         // TODO: check if this is the correct way to clear the file input
+        //         e.target.value = '';
+        //     });
+    }
 
     return (
         <div className={mappingExampleStyle}>
 
-            <DataPopup open={informationPopupOpen} setOpen={setInformationPopupOpen} data={information}/>
+            <DataPopup
+                open={informationPopupOpen}
+                setOpen={setInformationPopupOpen}
+                data={
+                <pre className={css`
+                  white-space: pre-wrap;
+                  word-wrap: normal;
+                `}>
+                    {information}
+                </pre>
+            }/>
 
             <Paper className={exampleDataAreaStyle}>
                 <div>
                     <h3>Example Data</h3>
-                    <FormControlLabel control={<Switch
-                        value={uploadFromFile}
-                        onChange={(e) => setUploadFromFile(e.target.checked)}
-                    />} label={'Upload From File?'}/>
-                    <FormControl>
-                        <Button>Upload File</Button>
-                    </FormControl>
+                    <div className={css`display: flex; flex-direction: row; justify-content: space-evenly`}>
+                        <FormControlLabel control={<Switch
+                            value={uploadFromFile}
+                            onChange={(e, value) => {
+                                setUploadFromFile(value);
+
+                                if (!value) setUploadFileName('');
+                                else {
+                                    setRawData('');
+                                    setShrink(false);
+                                }
+                            }
+                        }
+                        />} label={'Upload From File?'}/>
+
+                        <div hidden={!uploadFromFile}>
+                            <FormControl>
+                                <Button>
+                                    <FormControlLabel control={<Input type="file"
+                                                                      id='data-input'
+                                                                      name='data-input'
+                                                                      style={{display: 'none'}}
+                                                                      onClick={handleClick}
+                                                                      onChange={uploadFile}/>} label={'Upload File'}
+                                                      htmlFor='data-input'/>
+                                </Button>
+                            </FormControl>
+                        </div>
+                    </div>
+
                     <FormControl className={rawDataStyle}>
                         <InputLabel htmlFor='text-area' shrink={shrink}>
                             Raw Data
@@ -72,15 +129,14 @@ export const MappingExample = () => {
                         <TextField
                             id='text-area'
                             type='text'
+                            value={rawData}
                             multiline
                             rows={20}
                             fullWidth
                             onChange={handleRawDataInput}
+                            disabled={uploadFromFile}
                         />
                     </FormControl>
-                    <div>
-                        Your input is received.
-                    </div>
                 </div>
             </Paper>
             <Paper className={operationAreaStyle}>
@@ -89,6 +145,12 @@ export const MappingExample = () => {
                     <PopOver baseText={<HelpOutlineRounded sx={{height: '16px', width: '16px'}}/>}
                              popoverText={<Hint/>}/>
                 </div>
+                <FormControlLabel control={
+                    <Switch id="on-production"
+                            value={onProduction}
+                            onChange={(e, checked) => setOnProduction(checked)}/>
+                } label={onProduction ? 'Production Mode' : 'Trail Mode'}/>
+
                 <SchemaSelection setSelectedSchema={setSelectedSchema}
                                  setSelectedMapping={setSelectedMapping}
                                  setMappingData={setMappingData}
@@ -100,18 +162,26 @@ export const MappingExample = () => {
                     margin: auto
                   }
                 }`}>
-                    <ListItem><Button onClick={handleSubmit}>Go!</Button></ListItem>
-                    <ListItem><Button onClick={() => {
-                        setInformationPopupOpen(true);
-                        setInformation(JSON.stringify(selectedSchema));
-                    }}>Check Original Schema</Button></ListItem>
-                    <ListItem><Button onClick={() => {
+                    {rawData && rawData !== '' ? <ListItem>You will use the raw data.</ListItem> : null}
+                    {uploadFileName && uploadFileName !== '' ? <ListItem>You have uploaded: {uploadFileName}</ListItem> : null}
+                    <ListItem><Button onClick={handleSubmit} color={onProduction ? 'warning' : 'primary'}>
+                        {onProduction ? 'GO! (On Production)' : 'Try!'}
+                    </Button></ListItem>
+                    {/*<ListItem><Button disabled={!selectedSchema}*/}
+                    {/*    onClick={() => {*/}
+                    {/*    setInformationPopupOpen(true);*/}
+                    {/*    setInformation(JSON.stringify(selectedSchema));*/}
+                    {/*}}>Check Original Schema</Button></ListItem>*/}
+                    <ListItem><Button disabled={!selectedSchema}
+                        onClick={() => {
                         setInformationPopupOpen(true);
                         setInformation(JSON.stringify(selectedSchema));
                     }}>Check Target Schema</Button></ListItem>
-                    <ListItem><Button onClick={() => {
+                    <ListItem><Button disabled={!selectedMapping}
+                        onClick={() => {
                         setInformationPopupOpen(true);
-                        setInformation(JSON.stringify(mappingData));
+                        // TODO: toString should be abstracted
+                        setInformation(JSON.stringify(Object.fromEntries(mappingData)));
                     }}>Check Mapping Rules</Button></ListItem>
                 </List>
             </Paper>

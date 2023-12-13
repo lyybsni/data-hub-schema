@@ -66,7 +66,6 @@ export const SchemaSelection = (
                         ...item,
                         variables: temp,
                     });
-                    console.log(item)
                 });
                 props.setMappingData(data);
             }
