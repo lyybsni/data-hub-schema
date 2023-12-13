@@ -15,6 +15,7 @@ export default function MenuListComposition(
         onModify?: () => void,
         onDelete?: () => void,
         onLink?: () => void,
+        color?: 'inherit' | 'primary' | 'secondary' | 'action' | 'disabled' | 'error' | undefined,
     }
 ) {
     const [open, setOpen] = React.useState(false);
@@ -102,7 +103,7 @@ export default function MenuListComposition(
                     aria-haspopup="true"
                     onClick={handleToggle}
                 >
-                    <Edit/>
+                    <Edit color={props.color ?? 'inherit'}/>
                 </Button>
                 <Popper
                     open={open}

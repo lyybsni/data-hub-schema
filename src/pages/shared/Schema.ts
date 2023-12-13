@@ -45,9 +45,15 @@ export const updateSchema = async (schemaId: string, schema: any) => {
     });
 }
 
-export const updateMapping = async (schemaId: string, mapping: any) => {
+export const uploadMapping = async (schemaId: string, mapping: any) => {
     return await post(`/admin/mapping`, {
         schemaId: schemaId,
+        mapping: mapping,
+    });
+}
+
+export const updateMapping = async (mappingId: string, mapping: any) => {
+    return await put(`/admin/mapping/${mappingId}`, {
         mapping: mapping,
     });
 }

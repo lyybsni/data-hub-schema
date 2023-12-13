@@ -141,12 +141,13 @@ const LinkFieldModal = (props: {
         </div>
         <Button onClick={() => {
             const variables = new Map<string, string>();
-            const excludes = ['inherit', 'field'];
+            const excludes = ['inherit', 'field', 'regex', 'fromRegex', 'toRegex', 'expression'];
             rootMap.forEach((value, key) => {
                 if (!excludes.includes(key)) {
                     variables.set(`\${${key}}`, value);
                 }
             });
+            console.log(variables);
 
             props.onSubmit?.({
                 type: selection,
@@ -156,7 +157,7 @@ const LinkFieldModal = (props: {
                 fromRegex: rootMap.get('fromRegex'),
                 toRegex: rootMap.get('toRegex'),
                 variables: variables,
-            });
+            } as Linage);
 
             handleClose();
         }}>Link</Button>

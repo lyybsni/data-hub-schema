@@ -10,6 +10,8 @@ export const SchemaSelection = (
         setSelectedMapping: (mapping: string) => void,
         setMappingData: (mapping: Map<string, Linage>) => void,
 
+        selectedMapping?: string,
+
         style?: any
     }
 ) => {
@@ -51,7 +53,14 @@ export const SchemaSelection = (
             result => {
                 const data = new Map<string, Linage>();
                 result.mapping.forEach((item: any) => {
-                    data.set(item.path, {...item});
+                    const temp = new Map<string, string>();
+                    if (item.variables) Object.keys(item.variables).forEach((v: string) => {
+                        temp.set(v, item.variables[v]);
+                    });
+                    data.set(item.path, {
+                        ...item,
+                        variables: temp,
+                    });
                     console.log(item)
                 });
                 props.setMappingData(data);

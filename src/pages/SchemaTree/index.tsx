@@ -3,7 +3,7 @@ import React, {ReactElement, useEffect, useMemo, useState} from "react";
 import {Button, FormControl, FormControlLabel, Input, ListItem, Paper} from "@mui/material";
 import {fieldResolver, jsonToSchemaTree, stringifyLinage} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {getSchema, updateMapping, uploadCSVFile} from "../shared/Schema";
+import {getSchema, uploadMapping, uploadCSVFile, updateMapping} from "../shared/Schema";
 import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
@@ -173,9 +173,25 @@ const SchemaTreePage = () => {
 
                     <div className="button-group">
                         <Button onClick={() => setDisplayLinage(true)}>Show Rule Information</Button>
+                        <Button onClick={() => {
+                            setMappingData(new Map<string, Linage>());
+                            // setSelectedMapping('');
+                        }}>Clear Mapping</Button>
                         <Button onClick={getMappingBlob}>Export Mapping</Button>
                         <Button onClick={() => {
-                            updateMapping(selectedSchema, Object.fromEntries(mappingData)).then(r => console.log(r));
+                            console.log("Entries", Object.fromEntries(mappingData));
+                            const tempMap = new Map<string, any>();
+                            mappingData.forEach((value, key) => {
+                                tempMap.set(key, {
+                                    ...value,
+                                    variables: Object.fromEntries(value.variables?.entries() ?? [])
+                                });
+                            });
+                            if (selectedMapping === '') {
+                                uploadMapping(selectedSchema, Object.fromEntries(tempMap)).then(r => console.log(r));
+                            } else {
+                                updateMapping(selectedMapping, Object.fromEntries(tempMap)).then(r => console.log(r));
+                            }
                         }}>Save Mapping</Button>
                     </div>
                 </Paper>

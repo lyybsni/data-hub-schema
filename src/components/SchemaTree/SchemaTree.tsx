@@ -180,21 +180,25 @@ const SchemaTreeComponent = (props: {
                     `}>{linageMap.has(node.path) && linageMap.get(node.path) ? stringifyLinage(linageMap.get(node.path)) : ''}</span>
                 }/>
                 {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
-                <span><MenuListComposition enabled={enabled}
-                                           onAdd={() => {
+                <span hidden={props.enableLinkField && !node.isArray && (!!node.children?.length) && (node.children.length > 0)}>
+                    <MenuListComposition enabled={
+                        node.id === treeData[0].id ?
+                        enabled.filter(val => val !== 'delete') : enabled
+                    } color={linageMap.has(node.path) ? 'secondary' : 'primary'}
+                                                                                           onAdd={() => {
                                                setAddFieldModalOpen(true);
                                                setOriginalSchemaNode(node);
                                                setOnModify(false);
                                            }}
-                                           onModify={() => {
+                                                                                           onModify={() => {
                                                setAddFieldModalOpen(true);
                                                setOriginalSchemaNode(node);
                                                setOnModify(true);
                                            }}
-                                           onLink={() => {
+                                                                                           onLink={() => {
                                                setLinkFieldModalOpen(true);
                                            }}
-                                           onDelete={() => {
+                                                                                           onDelete={() => {
                                                // TODO: add a confirmation pop up
                                                handleDeleteNode(node.id);
                                                // setConfirmDelete(true);
