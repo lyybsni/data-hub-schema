@@ -1,9 +1,6 @@
 import {Linage, TreeNode} from "./TreeNode";
 import {SchemaResolve} from "../../pages/shared/Schema";
 
-export const schemaTreeMappingToJson = (nodes: any[]) => {
-    return nodes;
-}
 
 export const fieldResolver = (schemaResolve: SchemaResolve) => {
 
@@ -16,18 +13,47 @@ export const fieldResolver = (schemaResolve: SchemaResolve) => {
         children: [],
     } as TreeNode;
 
-    schemaResolve.fields?.forEach((child) => {
-        root.children?.push({
-            id: child.name,
-            name: child.name,
-            type: child.type,
-            path: root.path + '.' + child.name,
-            children: []
-        })
-    });
+    if (schemaResolve.fields) {
+        const sorted = schemaResolve.fields.sort((a, b) => {
+            if (a.path && b.path) {
+                if (a.path < b.path) return -1;
+                else if (a.path > b.path) return 1;
+                else return 0;
+            }
+            else return 0;
+        });
+
+        sorted.forEach((child) => {
+            let parent = root;
+            const paths = child.path?.split('.').slice(0, -1);
+            paths?.forEach((path) => {
+                let found = parent.children?.find((item) => item.name === path);
+
+                if (found) {
+                    parent = found;
+                } else {
+                    const node = {
+                        id: path,
+                        name: path.replaceAll("[0]", ''),
+                        isArray: path.endsWith("[0]"),
+                        path: parent.path + '.' + path,
+                        children: [],
+                    } as TreeNode;
+                    parent.children?.push(node);
+                    parent = node;
+                }
+            });
+
+            const node = {
+                ...child
+            } as TreeNode;
+            parent.children?.push(node);
+        });
+    }
 
     return root;
 }
+
 
 export const stringifyLinage = (info?: Linage) => {
     // console.log(info);

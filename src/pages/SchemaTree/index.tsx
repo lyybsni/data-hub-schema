@@ -3,7 +3,7 @@ import React, {ReactElement, useEffect, useMemo, useState} from "react";
 import {Button, FormControl, FormControlLabel, Input, ListItem, Paper} from "@mui/material";
 import {fieldResolver, jsonToSchemaTree, stringifyLinage} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {getSchema, uploadMapping, uploadCSVFile, updateMapping} from "../shared/Schema";
+import {getSchema, uploadMapping, uploadCSVFile, updateMapping, uploadJSONExample} from "../shared/Schema";
 import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
@@ -12,7 +12,7 @@ import {DataPopup} from "../../components/Menu/DataPopup";
 const SchemaTreePage = () => {
     const initTreeData = [{
         id: '1',
-        name: 'Input Root',
+        name: 'InputRoot',
         children: [],
         path: 'root'
     } as TreeNode];
@@ -65,6 +65,18 @@ const SchemaTreePage = () => {
         };
     };
 
+    const handleUploadJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(e.target);
+        if (!e.target || !e.target.files) {
+            return false;
+        }
+        // TODO
+        uploadJSONExample(e.target.files[0])
+            .then(res => res.json())
+            .then(data => {
+                setTreeData([fieldResolver(data)]);
+            });
+    }
     const handleUploadCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log(e.target);
         if (!e.target || !e.target.files) {
@@ -121,11 +133,21 @@ const SchemaTreePage = () => {
                         <FormControl>
                             <Button>
                                 <FormControlLabel control={<Input type="file"
-                                                                  id='csv-import'
-                                                                  name='csv-import'
+                                                                  id='json-sample'
+                                                                  name='json-sample'
                                                                   style={{display: 'none'}}
-                                                                  onChange={handleChange}/>} label={'Load Schema in JSON'}
-                                                  htmlFor='csv-import'/>
+                                                                  onChange={handleUploadJSON}/>} label={'Upload Sample Data (JSON)'}
+                                                  htmlFor='json-sample'/>
+                            </Button>
+                        </FormControl>
+                        <FormControl>
+                            <Button>
+                                <FormControlLabel control={<Input type="file"
+                                                                  id='csv-sample'
+                                                                  name='csv-sample'
+                                                                  style={{display: 'none'}}
+                                                                  onChange={handleUploadCSV}/>} label={'Upload Sample Data (CSV)'}
+                                                  htmlFor='csv-sample'/>
                             </Button>
                         </FormControl>
                         <FormControl>
@@ -134,12 +156,12 @@ const SchemaTreePage = () => {
                                                                   id='import-schema'
                                                                   name='import-schema'
                                                                   style={{display: 'none'}}
-                                                                  onChange={handleUploadCSV}/>} label={'Upload Sample Data (CSV)'}
+                                                                  onChange={handleChange}/>} label={'Import Schema'}
                                                   htmlFor='import-schema'/>
                             </Button>
                         </FormControl>
                         <FormControl>
-                            <Button onClick={getOriginalSchemaBlob}>Export Schema in JSON</Button>
+                            <Button onClick={getOriginalSchemaBlob}>Export Schema</Button>
                         </FormControl>
                     </div>
 

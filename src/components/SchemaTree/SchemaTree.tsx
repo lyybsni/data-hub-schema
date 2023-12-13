@@ -34,7 +34,7 @@ const SchemaTreeComponent = (props: {
     const [linkFieldModalOpen, setLinkFieldModalOpen] = React.useState(false);
     const [onModify, setOnModify] = React.useState(false);
     const [treeData, setTreeData] = React.useState<TreeNode[]>(props.initialTreeData ?? [
-        {id: '1', name: 'Input Root', children: [], path: 'root'} as TreeNode,
+        {id: '1', name: 'InputRoot', children: [], path: 'root'} as TreeNode,
     ]);
 
     const linageMap = useMemo(() => props.linageMap ?? new Map<string, Linage>(), [props.linageMap])
@@ -112,9 +112,40 @@ const SchemaTreeComponent = (props: {
     const handleModifyNode = (nodeId: string, newValue: BasicNode) => {
         const treeDataCopy = [...treeData];
         const targetNode = findNode(treeDataCopy, nodeId);
+
+        const modifyRoot = (node: TreeNode, pre: string, next: string) => {
+            const fromPath = node.path;
+            const toPath = node.path.replace(pre, next);
+
+            const fromValue = linageMap.get(fromPath);
+            if (fromValue !== undefined) {
+                linageMap.set(toPath, fromValue);
+                linageMap.delete(fromPath);
+            }
+
+            node.path = node.path.replace(pre, next);
+            node.children?.forEach((child) => {
+                modifyRoot(child, pre, next);
+            });
+        }
+
         if (targetNode) {
             targetNode.name = newValue.name;
             targetNode.type = newValue.type;
+
+            let targetPaths = '';
+            if (targetNode.path.includes(".")) {
+                targetPaths = targetNode.path.split(".")
+                    .slice(0, -1)
+                    .reduce((acc, cur) => {
+                        return acc + "." + cur
+                    }) + "." + newValue.name;
+            } else {
+                targetPaths = newValue.name;
+            }
+            modifyRoot(targetNode, targetNode.path, targetPaths);
+            console.log(targetPaths);
+
             setTreeData(treeDataCopy);
             props.fetchData?.(treeDataCopy);
         }

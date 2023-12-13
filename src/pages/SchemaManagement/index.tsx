@@ -34,7 +34,7 @@ const CreateSchema = (props: {
 export const SchemaManagementPage = () => {
     const initTreeData = [{
         id: '1',
-        name: 'Input Root',
+        name: 'InputRoot',
         children: [],
         path: 'root'
     } as TreeNode];

@@ -8,6 +8,9 @@ export type Schema = {
 export type Field = {
     name: string,
     type: string,
+    id?: string,
+    isArray?: boolean,
+    path?: string,
 }
 
 export type SchemaResolve = {
@@ -82,4 +85,12 @@ export const uploadCSVFile = async(
     const formData = new FormData();
     formData.append('file', file);
     return await post(`/admin/schema-from-csv`, formData, 'multipart/form-data');
+};
+
+export const uploadJSONExample = async(
+    file: File,
+) : Promise<Response> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return await post(`/admin/schema-from-json`, formData, 'multipart/form-data');
 };
