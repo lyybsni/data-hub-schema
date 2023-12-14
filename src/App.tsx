@@ -6,6 +6,7 @@ import {Box} from "@mui/material";
 import {SchemaManagementPage} from "./pages/SchemaManagement";
 import {MappingExample} from "./pages/MappingExample";
 import {css} from "@emotion/css";
+import {History} from "./pages/MappingHistory";
 
 function App() {
     const router = createBrowserRouter([
@@ -24,6 +25,9 @@ function App() {
         {
             path: "/example",
             element: <MappingExample/>
+        }, {
+            path: "/history",
+            element: <History/>
         }
     ]);
 
@@ -36,7 +40,8 @@ function App() {
             <Box id='nav-bar'>
                 <a href='/schema'>Schema Management</a>
                 <a href='/mapping'>Schema Mapping</a>
-                <a href='/example'>Mapping Example</a>
+                <a href='/example'>Mapping Trails</a>
+                <a href='/history'>Logs and Histories</a>
             </Box>
 
             <div className={mainContainerStyle}>
@@ -46,7 +51,6 @@ function App() {
             <Box id='footer'>
                 @2023 PolyU Graduate School
             </Box>
-
 
         </div>
     );
