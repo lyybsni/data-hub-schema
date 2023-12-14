@@ -7,6 +7,7 @@ import {SchemaManagementPage} from "./pages/SchemaManagement";
 import {MappingExample} from "./pages/MappingExample";
 import {css} from "@emotion/css";
 import {History} from "./pages/MappingHistory";
+import { UserManagement } from './pages/UserManagement';
 
 function App() {
     const router = createBrowserRouter([
@@ -28,6 +29,10 @@ function App() {
         }, {
             path: "/history",
             element: <History/>
+        },
+        {
+            path: "/user",
+            element: <UserManagement/>
         }
     ]);
 
@@ -42,6 +47,7 @@ function App() {
                 <a href='/mapping'>Schema Mapping</a>
                 <a href='/example'>Mapping Trails</a>
                 <a href='/history'>Logs and Histories</a>
+                <a href='/user'>Account</a>
             </Box>
 
             <div className={mainContainerStyle}>
