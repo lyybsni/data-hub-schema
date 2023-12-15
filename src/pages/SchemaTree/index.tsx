@@ -3,11 +3,21 @@ import React, {ReactElement, useEffect, useMemo, useState} from "react";
 import {Button, FormControl, FormControlLabel, Input, ListItem, Paper} from "@mui/material";
 import {fieldResolver, jsonToSchemaTree, stringifyLinage} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
-import {getSchema, uploadMapping, uploadCSVFile, updateMapping, uploadJSONExample} from "../shared/Schema";
+import {
+    getSchema,
+    SchemaResolve,
+    updateMapping,
+    uploadCSVFile,
+    uploadJSONExample,
+    uploadMapping
+} from "../shared/Schema";
 import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 import {DataPopup} from "../../components/Menu/DataPopup";
+import {useDispatch} from "react-redux";
+import {errorAlert, successAlert} from "../../utils/Request";
+import {openAlert} from "../../redux/AlertSlice";
 
 const SchemaTreePage = () => {
     const initTreeData = [{
@@ -16,6 +26,8 @@ const SchemaTreePage = () => {
         children: [],
         path: 'root'
     } as TreeNode];
+
+    const dispatch = useDispatch();
 
     const [treeData, setTreeData] = React.useState(initTreeData as TreeNode[]);
     const [schemaData, setSchemaData] = React.useState([] as any[]);
@@ -50,8 +62,10 @@ const SchemaTreePage = () => {
             getSchema(selectedSchema).then((res) => {
                 const target = JSON.parse(res.schema);
                 setSchemaData(target);
+            }).catch(() => {
+                dispatch(openAlert(errorAlert("Failed to get schema")));
             });
-    }, [selectedSchema]);
+    }, [dispatch, selectedSchema]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target || !e.target.files) {
@@ -75,31 +89,40 @@ const SchemaTreePage = () => {
             return false;
         }
         uploadJSONExample(e.target.files[0])
-            .then(res => res.json())
+            .catch(() => {
+                dispatch(openAlert(errorAlert("Failed to upload JSON")));
+                return {} as SchemaResolve;
+            })
             .then(data => {
-                setTreeData([fieldResolver(data)]);
-                // TODO: check if this is the correct way to clear the file input
-                e.target.value = '';
+                if (data.fields) {
+                    setTreeData([fieldResolver(data)]);
+                    dispatch(openAlert(successAlert("File uploaded successfully.")));
+                }
             });
     }
+
     const handleUploadCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log(e.target);
         if (!e.target || !e.target.files) {
             return false;
         }
         uploadCSVFile(e.target.files[0])
-            .then(res => res.json())
+            .catch(() => {
+                dispatch(openAlert(errorAlert("Failed to upload CSV")));
+            })
             .then(data => {
                 setTreeData([fieldResolver(data)]);
+                dispatch(openAlert(successAlert("File uploaded successfully.")));
             });
     }
 
-    const getMappingBlob = () => {
+    const getMappingBlob = async () => {
         const processedExportedData = JSON.stringify(mappingData);
-        return saveFile(
+        await saveFile(
             new Blob([processedExportedData], {type: 'application/json'}),
             "mapping.json"
         );
+        return dispatch(openAlert(successAlert("Mapping exported successfully.")));
     }
 
     const getOriginalSchemaBlob = () => {
@@ -207,6 +230,7 @@ const SchemaTreePage = () => {
                         <Button onClick={() => {
                             setMappingData(new Map<string, Linage>());
                             setSelectedMapping('');
+                            dispatch(openAlert(successAlert("Mapping cleared successfully.")));
                         }}>Clear Mapping</Button>
                         <Button onClick={getMappingBlob}>Export Mapping</Button>
                         <Button onClick={() => {
@@ -223,6 +247,7 @@ const SchemaTreePage = () => {
                             } else {
                                 updateMapping(selectedMapping, Object.fromEntries(tempMap)).then(r => console.log(r));
                             }
+                            dispatch(openAlert(successAlert("Mapping saved successfully.")));
                         }}>Save Mapping</Button>
                     </div>
                 </Paper>

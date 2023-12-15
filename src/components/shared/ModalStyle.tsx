@@ -8,6 +8,10 @@ export const modalStyle = css`
   border: 2px solid grey;
   border-radius: 5px;
   padding: 10px;
+  
+  // TODO: the overflow should not be in this place
+  max-height: 45%;
+  overflow-y: scroll;
 
   .modal-input-group {
     display: flex;

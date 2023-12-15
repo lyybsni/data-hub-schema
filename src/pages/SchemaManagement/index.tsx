@@ -9,10 +9,14 @@ import {
     MenuItem,
     MenuList,
     Paper,
-    Select, Switch
+    Select,
+    Switch
 } from "@mui/material";
 import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
 import {css} from "@emotion/css";
+import {useDispatch} from "react-redux";
+import {openAlert} from "../../redux/AlertSlice";
+import {errorAlert, successAlert} from "../../utils/Request";
 
 const CreateSchema = (props: {
     selectedSchema: string,
@@ -45,15 +49,21 @@ export const SchemaManagementPage = () => {
     const [schemaList, setSchemaList] = React.useState([] as any[]);
     const [savedSchema, setSavedSchema] = React.useState([] as any[]);
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         getSchemaList().then((res) => {
+            console.log(res);
             return res.map((item) => {
                 return (<MenuItem value={item.id} key={item.id}>
                     {item.schema.name ?? item.id}
                 </MenuItem>)
             })
-        }).then(setSchemaList);
-    }, []);
+        }).then(setSchemaList)
+            .catch(() => {
+                dispatch(openAlert(errorAlert("Get schema list failed.")));
+            });
+    }, [dispatch]);
 
     useEffect(() => {
         if (selectedSchema)
@@ -61,19 +71,25 @@ export const SchemaManagementPage = () => {
                 const target = JSON.parse(res.schema);
                 setTreeData(target);
                 setSavedSchema(target);
+            }).catch(() => {
+                dispatch(openAlert(errorAlert("Get schema failed.")));
             });
-    }, [selectedSchema]);
+    }, [dispatch, selectedSchema]);
 
     const handleSubmitSchema = () => {
         if (selectedSchema) {
-            console.log(treeData);
-            updateSchema(selectedSchema, JSON.stringify(treeData)).then((res) => {
-                console.log(res);
-            });
+            updateSchema(selectedSchema, JSON.stringify(treeData))
+                .then(() => {
+                    dispatch(openAlert(successAlert("Schema updated successfully.")));
+                })
+                // .catch(() => {
+                //     // dispatch(openAlert(errorAlert("Update schema failed.")));
+                // });
         } else {
-            createSchema(JSON.stringify(treeData)).then((res) => {
-                console.log(res);
-            });
+            createSchema(JSON.stringify(treeData))
+                .then(() => {
+                    dispatch(openAlert(successAlert("Schema created successfully.")));
+                });
         }
     };
 
@@ -84,11 +100,11 @@ export const SchemaManagementPage = () => {
                 <FormControl className={schemaFilterStyle}>
                     <FormControlLabel control={<Switch id='create-schema'
                                                        value={createSchemaMode}
-                                                         onChange={(e) => {
-                                                             setCreateSchemaMode(e.target.checked);
-                                                             setSelectedSchema('');
-                                                             setTreeData(e.target.checked ? initTreeData : []);
-                                                         }}/>} label={'Create New Schema'}/>
+                                                       onChange={(e) => {
+                                                           setCreateSchemaMode(e.target.checked);
+                                                           setSelectedSchema('');
+                                                           setTreeData(e.target.checked ? initTreeData : []);
+                                                       }}/>} label={'Create New Schema'}/>
                 </FormControl>
                 <CreateSchema
                     display={!createSchemaMode}
@@ -105,7 +121,7 @@ export const SchemaManagementPage = () => {
                         initialTreeData={treeData}
                         fetchData={setTreeData}
                         enableAddField={true}
-                    />:<span>No schema selected currently.</span>}
+                    /> : <span>No schema selected currently.</span>}
             </Paper>
 
             <Paper className={css`min-width: 280px`}>
@@ -137,7 +153,7 @@ const schemaFactoryStyle = css`
 `;
 
 const schemaFilterStyle = css`
-    text-align: left;
-    padding-left: 30px;
-    padding-right: 30px;
+  text-align: left;
+  padding-left: 30px;
+  padding-right: 30px;
 `;

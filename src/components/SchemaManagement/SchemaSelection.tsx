@@ -26,6 +26,7 @@ export const SchemaSelection = (
     useEffect(() => {
         // load the data from back end
         getSchemaList().then((res) => {
+            console.log("HERE", res);
             return res.map((item) => {
                 return (<MenuItem value={item.id} key={item.id}>
                     {item.schema.name ?? item.id}

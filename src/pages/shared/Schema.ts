@@ -24,7 +24,6 @@ export const getSchema = async (schemaId: string) => {
 
 export const getSchemaList = async (): Promise<Schema[]> => {
     const res = await get('/admin/schemas');
-    // console.log(res);
     const result = [] as Schema[];
     res.forEach((item: any) => {
         result.push({
@@ -81,7 +80,7 @@ export const getMapping = async (mappingId: string) => {
 
 export const uploadCSVFile = async(
     file: File,
-) : Promise<Response> => {
+)=> {
     const formData = new FormData();
     formData.append('file', file);
     return await post(`/admin/schema-from-csv`, formData, 'multipart/form-data');
@@ -89,7 +88,7 @@ export const uploadCSVFile = async(
 
 export const uploadJSONExample = async(
     file: File,
-) : Promise<Response> => {
+) => {
     const formData = new FormData();
     formData.append('file', file);
     return await post(`/admin/schema-from-json`, formData, 'multipart/form-data');

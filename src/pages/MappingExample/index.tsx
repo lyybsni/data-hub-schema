@@ -17,7 +17,7 @@ import {HelpOutlineRounded} from "@mui/icons-material";
 import {Hint} from "./Hint";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 import {Linage} from "../../components/SchemaTree/TreeNode";
-import {trailRun} from "../shared/Convert";
+import {run, trailRun} from "../shared/Convert";
 import {DataPopup} from "../../components/Menu/DataPopup";
 
 export const MappingExample = () => {
@@ -30,6 +30,7 @@ export const MappingExample = () => {
     const [selectedMapping, setSelectedMapping] = React.useState('' as string);
     const [mappingData, setMappingData] = React.useState(new Map<string, Linage>());
 
+    const [uploadedFile, setUploadedFile] = React.useState(null as any);
     const [uploadFileName, setUploadFileName] = React.useState('' as string);
     const [onProduction, setOnProduction] = React.useState(false as boolean);
 
@@ -46,10 +47,14 @@ export const MappingExample = () => {
     }
 
     const handleSubmit = () => {
-        trailRun(rawData, selectedSchema, selectedMapping)
+        if (onProduction) {
+            run(uploadedFile, selectedMapping);
+        } else {
+            trailRun(rawData, selectedSchema, selectedMapping)
             .then(async r => {
                 setDisplayData(JSON.stringify(await r.json(), null, 2));
             });
+        }
     }
 
     const [informationPopupOpen, setInformationPopupOpen] = React.useState(false);
@@ -65,13 +70,7 @@ export const MappingExample = () => {
             return false;
         }
         setUploadFileName(e.target.files[0].name);
-        // uploadJSONExample(e.target.files[0])
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         // setTreeData([fieldResolver(data)]);
-        //         // TODO: check if this is the correct way to clear the file input
-        //         e.target.value = '';
-        //     });
+        setUploadedFile(e.target.files[0])
     }
 
     return (
@@ -81,18 +80,20 @@ export const MappingExample = () => {
                 open={informationPopupOpen}
                 setOpen={setInformationPopupOpen}
                 data={
-                <pre className={css`
-                  white-space: pre-wrap;
-                  word-wrap: normal;
-                `}>
+                    <pre className={css`
+                      white-space: pre-wrap;
+                      word-wrap: normal;
+                    `}>
                     {information}
                 </pre>
-            }/>
+                }/>
 
             <Paper className={exampleDataAreaStyle}>
                 <div>
                     <h3>Example Data</h3>
-                    <div className={css`display: flex; flex-direction: row; justify-content: space-evenly`}>
+                    <div className={css`display: flex;
+                      flex-direction: row;
+                      justify-content: space-evenly`}>
                         <FormControlLabel control={<Switch
                             value={uploadFromFile}
                             onChange={(e, value) => {
@@ -104,7 +105,7 @@ export const MappingExample = () => {
                                     setShrink(false);
                                 }
                             }
-                        }
+                            }
                         />} label={'Upload From File?'}/>
 
                         <div hidden={!uploadFromFile}>
@@ -163,26 +164,23 @@ export const MappingExample = () => {
                   }
                 }`}>
                     {rawData && rawData !== '' ? <ListItem>You will use the raw data.</ListItem> : null}
-                    {uploadFileName && uploadFileName !== '' ? <ListItem>You have uploaded: {uploadFileName}</ListItem> : null}
-                    <ListItem><Button onClick={handleSubmit} color={onProduction ? 'warning' : 'primary'}>
+                    {uploadFileName && uploadFileName !== '' ?
+                        <ListItem>You have uploaded: {uploadFileName}</ListItem> : null}
+                    <ListItem><Button onClick={handleSubmit}
+                                      color={onProduction ? 'warning' : 'primary'}>
                         {onProduction ? 'GO! (On Production)' : 'Try!'}
                     </Button></ListItem>
-                    {/*<ListItem><Button disabled={!selectedSchema}*/}
-                    {/*    onClick={() => {*/}
-                    {/*    setInformationPopupOpen(true);*/}
-                    {/*    setInformation(JSON.stringify(selectedSchema));*/}
-                    {/*}}>Check Original Schema</Button></ListItem>*/}
                     <ListItem><Button disabled={!selectedSchema}
-                        onClick={() => {
-                        setInformationPopupOpen(true);
-                        setInformation(JSON.stringify(selectedSchema));
-                    }}>Check Target Schema</Button></ListItem>
+                                      onClick={() => {
+                                          setInformationPopupOpen(true);
+                                          setInformation(JSON.stringify(selectedSchema));
+                                      }}>Check Target Schema</Button></ListItem>
                     <ListItem><Button disabled={!selectedMapping}
-                        onClick={() => {
-                        setInformationPopupOpen(true);
-                        // TODO: toString should be abstracted
-                        setInformation(JSON.stringify(Object.fromEntries(mappingData)));
-                    }}>Check Mapping Rules</Button></ListItem>
+                                      onClick={() => {
+                                          setInformationPopupOpen(true);
+                                          // TODO: toString should be abstracted
+                                          setInformation(JSON.stringify(Object.fromEntries(mappingData)));
+                                      }}>Check Mapping Rules</Button></ListItem>
                 </List>
             </Paper>
             <Paper className={resultDataAreaStyle}>
