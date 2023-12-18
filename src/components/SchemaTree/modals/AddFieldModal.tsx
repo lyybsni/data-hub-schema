@@ -1,7 +1,7 @@
 import {Button, FormControl, FormControlLabel, Modal, Switch, TextField} from "@mui/material";
 import React from "react";
 
-import '../../../pages/SchemaTree/SchemaTree.css';
+import '../../../pages/Mapping/SchemaTree.css';
 import {Form, FormikProvider, useFormik} from "formik";
 import {BasicNode} from "../TreeNode";
 import {modalStyle} from "../../shared/ModalStyle";

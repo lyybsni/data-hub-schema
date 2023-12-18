@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useMemo} from "react";
 import {ChevronRight, ExpandMore} from "@mui/icons-material";
 import AddFieldModal from "./modals/AddFieldModal";
 import LinkFieldModal from "./modals/LinkFieldModal";
-import '../../pages/SchemaTree/SchemaTree.css';
+import '../../pages/Mapping/SchemaTree.css';
 import {BasicNode, Linage, TreeNode} from "./TreeNode";
 import {DisplayNode} from "./DisplayNode";
 import MenuListComposition from "../Menu/NodeMenu";

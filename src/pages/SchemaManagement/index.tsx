@@ -17,6 +17,7 @@ import {css} from "@emotion/css";
 import {useDispatch} from "react-redux";
 import {openAlert} from "../../redux/AlertSlice";
 import {errorAlert, successAlert} from "../../utils/Request";
+import {TitleWithHint} from "../../components/title/Title";
 
 const CreateSchema = (props: {
     selectedSchema: string,
@@ -93,10 +94,21 @@ export const SchemaManagementPage = () => {
         }
     };
 
+    const schemaFactoryHintText = [
+        "To create a new schema, click the switch on the left to enter the schema factory mode.",
+        "To edit an existing schema, select the schema from the dropdown menu on the left."
+    ];
+
+    const schemaPlaygroundHintText = [
+        "For existing fields, you can add a subfield, modify the field, and delete the field with all subfields.",
+        "Please be noted that you should click the 'Save Schema' button to save your changes.",
+        "You can not delete the root node."
+        ];
+
     return (
         <div className={containerStyle}>
             <Paper className={schemaFactoryStyle}>
-                <h3>Schema Factory</h3>
+                <TitleWithHint title={"Schema Factory"} article={schemaFactoryHintText}/>
                 <FormControl className={schemaFilterStyle}>
                     <FormControlLabel control={<Switch id='create-schema'
                                                        value={createSchemaMode}
@@ -115,7 +127,7 @@ export const SchemaManagementPage = () => {
             </Paper>
 
             <Paper className={css`min-width: calc(70% - 300px);`}>
-                <h3>Schema Playground</h3>
+                <TitleWithHint title={"Schema Playground"} article={schemaPlaygroundHintText}/>
                 {(createSchemaMode || selectedSchema) ?
                     <SchemaTreeComponent
                         initialTreeData={treeData}

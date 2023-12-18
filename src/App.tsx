@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import SchemaTreePage from "./pages/SchemaTree";
+import SchemaTreePage from "./pages/Mapping";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {Alert, Box, Snackbar} from "@mui/material";
 import {SchemaManagementPage} from "./pages/SchemaManagement";
@@ -61,7 +61,7 @@ function App() {
             <Box id='nav-bar'>
                 <a href='/schema'>Schema Management</a>
                 <a href='/mapping'>Schema Mapping</a>
-                <a href='/example'>Mapping Trails</a>
+                <a href='/example'>Mapping Trials</a>
                 <a href='/history'>Logs and Histories</a>
                 <a href='/user'>Account (Mock User 3)</a>
             </Box>

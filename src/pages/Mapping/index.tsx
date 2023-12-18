@@ -18,6 +18,7 @@ import {DataPopup} from "../../components/Menu/DataPopup";
 import {useDispatch} from "react-redux";
 import {errorAlert, successAlert} from "../../utils/Request";
 import {openAlert} from "../../redux/AlertSlice";
+import {TitleWithHint} from "../../components/title/Title";
 
 const SchemaTreePage = () => {
     const initTreeData = [{
@@ -143,13 +144,24 @@ const SchemaTreePage = () => {
         return result;
     }, [mappingData]);
 
+    const dataSchemaHintText = [
+      "You can upload sample data to retrieve the data structure. Your file name will be the root element of the tree.",
+        "For .json file, the data type will be inferred directly.",
+        "For .csv file, the data type will normally processed as `String`."
+    ];
+
+    const mappingHintText = [
+        "You can match fields from the input schema. Please be noted that, your input schema will NOT be saved.",
+        "When Create Mapping mode is on, the save button will bring a new instance for the schema.",
+        "When Updating Mapping mode is on, the mapping will be modified until the save button is clicked.",
+        "The clearing mapping button will not directly modify our record. However, after clearing and clicking the saving button, the record will be deleted."
+    ]
+
     return (
             <div className={containerStyle}>
                 <Paper className={leftContainerStyle}>
 
-                    <div>
-                        <h3>Your Data Schema</h3>
-                    </div>
+                    <TitleWithHint title={"Your Data Schema"} article={dataSchemaHintText}/>
 
                     <SchemaTreeComponent
                         initialTreeData={treeData}
@@ -199,9 +211,7 @@ const SchemaTreePage = () => {
 
                 <Paper className={rightContainerStyle}>
 
-                    <div>
-                        <h3>Target Schema Mapping</h3>
-                    </div>
+                    <TitleWithHint title={"Target Schema Mapping"} article={mappingHintText}/>
 
                     <SchemaSelection setSelectedSchema={setSelectedSchema}
                                      setSelectedMapping={setSelectedMapping}

@@ -36,6 +36,13 @@ export const MappingExample = () => {
 
     const [displayData, setDisplayData] = React.useState('');
 
+
+    const operationHintText = [
+        "To utilize the show case, you must finish at least one mapping in the previous page.",
+        "You can put your example data in the text area, or upload a .csv file."
+    ]
+
+
     const handleRawDataInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         if (e.target.value) {
             setShrink(true);
@@ -143,8 +150,7 @@ export const MappingExample = () => {
             <Paper className={operationAreaStyle}>
                 <div className={operationsStyle}>
                     <h3>Operations</h3>
-                    <PopOver baseText={<HelpOutlineRounded sx={{height: '16px', width: '16px'}}/>}
-                             popoverText={<Hint/>}/>
+                    <Hint article={operationHintText}/>
                 </div>
                 <FormControlLabel control={
                     <Switch id="on-production"
