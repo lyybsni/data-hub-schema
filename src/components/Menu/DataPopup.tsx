@@ -43,7 +43,7 @@ export const ConfirmDataPopup = (props: {
 }
 
 const dialogStyle = css`
-  width: 50%;
-  height: 50%;
+  min-width: 50%;
+  min-height: 50%;
   margin: auto ;
-    `;
+`;

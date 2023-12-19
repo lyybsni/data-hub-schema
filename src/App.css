@@ -33,7 +33,7 @@
   justify-content: space-evenly;
   align-items: center;
   min-height: 50px;
-  background: rgba(178, 34, 34, 0.5);
+  background: rgba(180, 30, 30, 0.7);
 }
 
 #nav-bar a {
@@ -42,7 +42,7 @@
 }
 
 #footer {
-  background: rgba(178, 34, 34, 0.5);
+  background: rgba(180, 30, 30, 0.7);
   min-height: 15px;
   color: white;
 }

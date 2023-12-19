@@ -20,7 +20,7 @@ export const SchemaSelection = (
 
     const [selectedSchema, setSelectedSchema] = React.useState('');
     const [selectedMapping, setSelectedMapping] = React.useState(props.selectedMapping ?? '');
-
+    const [noValidMapping, setNoValidMapping] = React.useState(false as boolean);
     const [createMapping, setCreateMapping] = React.useState(false as boolean);
 
     useEffect(() => {
@@ -48,30 +48,38 @@ export const SchemaSelection = (
                         {item.id}
                     </MenuItem>)
                 })
-            }).then(setMappingList);
+            }).then(res => {
+                if (res.length === 0) {
+                    setNoValidMapping(true);
+                    setSelectedMapping('');
+                    setMappingList([]);
+                } else {
+                    setMappingList(res);
+                    setNoValidMapping(false);
+                }
+            });
     }, [selectedSchema]);
 
     useEffect(() => {
-        if (!selectedMapping) {
-            return;
+        if (selectedMapping && !noValidMapping) {
+            getMapping(selectedMapping).then(
+                result => {
+                    const data = new Map<string, Linage>();
+                    result.mapping.forEach((item: any) => {
+                        const temp = new Map<string, string>();
+                        if (item.variables) Object.keys(item.variables).forEach((v: string) => {
+                            temp.set(v, item.variables[v]);
+                        });
+                        data.set(item.path, {
+                            ...item,
+                            variables: temp,
+                        });
+                    });
+                    props.setMappingData(data);
+                }
+            )
         }
-        getMapping(selectedMapping).then(
-            result => {
-                const data = new Map<string, Linage>();
-                result.mapping.forEach((item: any) => {
-                    const temp = new Map<string, string>();
-                    if (item.variables) Object.keys(item.variables).forEach((v: string) => {
-                        temp.set(v, item.variables[v]);
-                    });
-                    data.set(item.path, {
-                        ...item,
-                        variables: temp,
-                    });
-                });
-                props.setMappingData(data);
-            }
-        )
-    }, [selectedMapping]);
+    }, [selectedMapping, noValidMapping]);
 
     return (<div>
         <div hidden={!(props.allowCreateMapping ?? true)}>
@@ -92,7 +100,7 @@ export const SchemaSelection = (
                             props.setSelectedMapping('');
                         }}>{schemaList}</Select>
             </FormControl>
-            <FormControl className="schema-selection" disabled={createMapping || selectedSchema === ''}>
+            <FormControl className="schema-selection" disabled={createMapping || selectedSchema === '' || noValidMapping}>
                 <InputLabel htmlFor='mapping'>Current Mapping</InputLabel>
                 <Select id="mapping"
                         label="Current Mapping"

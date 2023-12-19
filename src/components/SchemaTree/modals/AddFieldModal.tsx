@@ -1,4 +1,4 @@
-import {Button, FormControl, FormControlLabel, Modal, Switch, TextField} from "@mui/material";
+import {Button, FormControl, FormControlLabel, MenuItem, Modal, Select, Switch, TextField} from "@mui/material";
 import React from "react";
 
 import '../../../pages/Mapping/SchemaTree.css';
@@ -11,9 +11,9 @@ import {ConfirmDataPopup} from "../../Menu/DataPopup";
 const AddFieldModal = (props: {
     open: boolean,
     handleClose: () => void,
-    onAdd: (node: BasicNode) => void,
-
     initialValues?: BasicNode,
+
+    onAdd: (node: BasicNode) => void,
     onModify?: ((newNode: BasicNode) => void) | undefined
 }) => {
 
@@ -23,14 +23,15 @@ const AddFieldModal = (props: {
                 ...props.initialValues,
                 isArray: props.initialValues.type === 'array'
             } : {
+                isPrimary: false,
                 isArray: false,
                 name: '',
-                type: ''
+                type: 'Object',
             },
             onSubmit: async (values) => {
                 const node = {...values};
                 if (!props.onModify) {
-                    props.onAdd( node);
+                    props.onAdd(node);
                 } else {
                     // TODO: not working
                     setData("Are you sure to modify this node?");
@@ -55,34 +56,59 @@ const AddFieldModal = (props: {
             <ConfirmDataPopup open={confirmOpen} setOpen={setConfirmOpen} data={data} onDelete={() => {
                 onConfirm?.();
             }}/>
-        <FormikProvider value={formik}>
-            <Form onSubmit={formik.handleSubmit} className={modalFieldStyle}>
-                <FormControl>
-                    <FormControlLabel control={<Switch
-                        id='isArray'
-                        name='isArray'
-                        checked={formik.values.isArray}
-                        onChange={formik.handleChange}/>} label={'Is Array?'}/>
-                </FormControl>
-                <TextField type='text'
-                           id='name'
-                           name='name'
-                           value={formik.values.name}
-                           onChange={formik.handleChange}
-                           label='Attribute Name'/>
-                <TextField type='text'
-                           id='type'
-                           name='type'
-                           value={formik.values.type}
-                           disabled={formik.values.isArray}
-                           onChange={formik.handleChange}
-                           label='Attribute Type'/>
-                <Button type='submit' fullWidth>
-                    Submit
-                </Button>
-            </Form>
-        </FormikProvider>
-    </div>;
+            <FormikProvider value={formik}>
+                <Form onSubmit={formik.handleSubmit} className={modalFieldStyle}>
+                    <div className={css`display: flex; flex-wrap: wrap`}>
+                    <FormControl className={fieldStyle}>
+                        <FormControlLabel control={<Switch
+                            id='isArray'
+                            name='isArray'
+                            checked={formik.values.isArray}
+                            onChange={(e) => {
+                                formik.handleChange(e);
+                                if (e.target.checked) {
+                                    formik.setFieldValue('type', 'Array');
+                                }
+                            }}/>} label={'Is Array?'}/>
+                    </FormControl>
+                    <FormControl className={fieldStyle}>
+                        <FormControlLabel control={<Switch
+                            id='isPrimary'
+                            name='isPrimary'
+                            checked={formik.values.isPrimary}
+                            onChange={formik.handleChange}/>} label={'Is Primary?'}/>
+                    </FormControl>
+                    <FormControl className={fieldStyle}>
+                        <TextField type='text'
+                                   id='name'
+                                   name='name'
+                                   value={formik.values.name}
+                                   onChange={formik.handleChange}
+                                   label='Attribute Name'/>
+                    </FormControl>
+                    <FormControl className={fieldStyle}>
+                        <Select id='type'
+                                name='type'
+                                label='Attribute Type'
+                                onChange={formik.handleChange}
+                                value={formik.values.type}
+                                disabled={formik.values.isArray}
+                        >
+                            <MenuItem value='String'>String</MenuItem>
+                            <MenuItem value='Enumeration'>Enumeration</MenuItem>
+                            <MenuItem value='Number'>Number</MenuItem>
+                            <MenuItem value='Boolean'>Boolean</MenuItem>
+                            <MenuItem value='Array'>Array</MenuItem>
+                            <MenuItem value='Object'>Object</MenuItem>
+                        </Select>
+                    </FormControl>
+                    </div>
+                    <Button type='submit' fullWidth>
+                        Submit
+                    </Button>
+                </Form>
+            </FormikProvider>
+        </div>;
 
     const handleClose = () => {
         props.handleClose();
@@ -99,10 +125,15 @@ const AddFieldModal = (props: {
 const modalFieldStyle = css`
   display: flex;
   flex-direction: column;
-  
+
   div {
     margin: 2px;
   }
 `;
+
+const fieldStyle = css`
+  width: 45%;
+  margin: auto;
+`
 
 export default AddFieldModal;

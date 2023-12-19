@@ -11,12 +11,12 @@ export const Hint = (
 ) => {
     const convert = (article: string[]) => {
         return article.map((item, idx) => {
-            return <ListItem itemID={`${idx}`}>{item}</ListItem>
+            return <ListItem itemID={`${idx}`} sx={{display: 'list-item'}}>{item}</ListItem>
         })
     }
     return <PopOver baseText={<HelpOutlineRounded sx={{height: '16px', width: '16px'}}/>}
                     popoverText={<div>
-                        <List>
+                        <List sx={{listStyle: 'decimal', pl: 4}}>
                             {convert(props.article)}
                         </List>
                     </div>}/>

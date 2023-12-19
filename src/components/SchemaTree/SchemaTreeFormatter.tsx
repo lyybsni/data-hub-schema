@@ -58,7 +58,7 @@ export const fieldResolver = (schemaResolve: SchemaResolve) => {
 export const stringifyLinage = (info?: Linage) => {
     // console.log(info);
     if (info?.inherit != null) {
-        return ` <- ${info?.inherit}`
+        return ` ${info?.inherit}`
     } else if (info?.expression != null) {
         const match = info?.expression.matchAll(/\${\d+}/g);
         let copy = info.expression;
@@ -67,9 +67,9 @@ export const stringifyLinage = (info?: Linage) => {
 
             console.log(item)
         });
-        return ` <- ${copy}`
+        return ` ${copy}`
     } else if (info?.transform != null) {
-        return ` <- ${info.transform} : ${info.fromRegex} -> ${info.toRegex}`
+        return ` ${info.transform} : ${info.fromRegex} -> ${info.toRegex}`
     }
     return '';
 }

@@ -19,6 +19,8 @@ import {useDispatch} from "react-redux";
 import {errorAlert, successAlert} from "../../utils/Request";
 import {openAlert} from "../../redux/AlertSlice";
 import {TitleWithHint} from "../../components/title/Title";
+import {Download, Upload} from "@mui/icons-material";
+import {MappingRule} from "../../components/MappingRule";
 
 const SchemaTreePage = () => {
     const initTreeData = [{
@@ -80,16 +82,29 @@ const SchemaTreePage = () => {
         };
     };
 
+    const handleUploadSampleData = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target || !e.target.files) {
+            return false;
+        }
+        const file = e.target.files[0];
+        if (file.name.endsWith(".json")) {
+            return handleUploadJSON(file);
+        } else if (file.name.endsWith(".csv")) {
+            return handleUploadCSV(file);
+        } else {
+            dispatch(openAlert({
+                message: "Unsupported file type",
+                severity: "error"
+            }));
+        }
+    }
+
     const handleClick = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
         e.currentTarget.value = '';
     }
 
-    const handleUploadJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target);
-        if (!e.target || !e.target.files) {
-            return false;
-        }
-        uploadJSONExample(e.target.files[0])
+    const handleUploadJSON = (file: File) => {
+        uploadJSONExample(file)
             .catch(() => {
                 dispatch(openAlert(errorAlert("Failed to upload JSON")));
                 return {} as SchemaResolve;
@@ -102,12 +117,8 @@ const SchemaTreePage = () => {
             });
     }
 
-    const handleUploadCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target);
-        if (!e.target || !e.target.files) {
-            return false;
-        }
-        uploadCSVFile(e.target.files[0])
+    const handleUploadCSV = (file: File) => {
+        uploadCSVFile(file)
             .catch(() => {
                 dispatch(openAlert(errorAlert("Failed to upload CSV")));
             })
@@ -132,6 +143,7 @@ const SchemaTreePage = () => {
             "schema.json");
     }
 
+    // TODO:
     const DisplayLinage = useMemo(() => {
         const result = [] as ReactElement[]
         mappingData.forEach((value, key) => {
@@ -173,22 +185,11 @@ const SchemaTreePage = () => {
                         <FormControl>
                             <Button>
                                 <FormControlLabel control={<Input type="file"
-                                                                  id='json-sample'
-                                                                  name='json-sample'
-                                                                  style={{display: 'none'}}
-                                                                  onClick={handleClick}
-                                                                  onChange={handleUploadJSON}/>} label={'Upload Sample Data (JSON)'}
-                                                  htmlFor='json-sample'/>
-                            </Button>
-                        </FormControl>
-                        <FormControl>
-                            <Button>
-                                <FormControlLabel control={<Input type="file"
                                                                   id='csv-sample'
                                                                   name='csv-sample'
                                                                   style={{display: 'none'}}
                                                                   onClick={handleClick}
-                                                                  onChange={handleUploadCSV}/>} label={'Upload Sample Data (CSV)'}
+                                                                  onChange={handleUploadSampleData}/>} label={<span className={css`display: inline-flex`}><Upload/>Sample Data</span>}
                                                   htmlFor='csv-sample'/>
                             </Button>
                         </FormControl>
@@ -198,12 +199,12 @@ const SchemaTreePage = () => {
                                                                   id='import-schema'
                                                                   name='import-schema'
                                                                   style={{display: 'none'}}
-                                                                  onChange={handleChange}/>} label={'Import Schema'}
+                                                                  onChange={handleChange}/>} label={<span className={css`display: inline-flex`}><Upload/>Feed</span>}
                                                   htmlFor='import-schema'/>
                             </Button>
                         </FormControl>
                         <FormControl>
-                            <Button onClick={getOriginalSchemaBlob}>Export Schema</Button>
+                            <Button onClick={getOriginalSchemaBlob}><span className={css`display: inline-flex`}><Download/>Download</span></Button>
                         </FormControl>
                     </div>
 
@@ -231,7 +232,7 @@ const SchemaTreePage = () => {
                     </div>
 
                     <DataPopup
-                    data={DisplayLinage}
+                    data={<MappingRule data={mappingData}/>}
                     open={displayLinage}
                     setOpen={setDisplayLinage}/>
 

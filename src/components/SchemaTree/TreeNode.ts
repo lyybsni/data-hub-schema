@@ -2,6 +2,7 @@ export type BasicNode = {
     name: string,
     type?: string,
     isArray?: boolean,
+    isPrimary?: boolean,
 }
 
 export type TreeNode = {
@@ -10,6 +11,7 @@ export type TreeNode = {
     type?: string,
     path: string,
     isArray?: boolean,
+    isPrimary?: boolean,
     children?: TreeNode[]
 };
 
@@ -17,7 +19,7 @@ export type Linage = {
     type?: string,
     expression?: string,
     inherit?: string,
-    transform?: string,    // TODO: change name
+    transform?: string,
     fromRegex?: string,
     toRegex?: string,
 

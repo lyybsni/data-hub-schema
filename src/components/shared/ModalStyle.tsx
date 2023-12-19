@@ -10,16 +10,8 @@ export const modalStyle = css`
   padding: 10px;
   
   // TODO: the overflow should not be in this place
-  max-height: 45%;
-  overflow-y: scroll;
+  max-height: 70%;
 
-  .modal-input-group {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 10px 25px 10px;
-  }
-  
   h3 {
     padding-left: 10px;
     margin: 6px;
