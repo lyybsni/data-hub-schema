@@ -19,8 +19,10 @@ import {useDispatch} from "react-redux";
 import {errorAlert, successAlert} from "../../utils/Request";
 import {openAlert} from "../../redux/AlertSlice";
 import {TitleWithHint} from "../../components/title/Title";
-import {Download, Upload} from "@mui/icons-material";
+import {Clear, Download, Edit, Save, Search, Upload} from "@mui/icons-material";
 import {MappingRule} from "../../components/MappingRule";
+import {ButtonWithIcon} from "../../components/Menu/ButtonWithIcon";
+import {ExtractNamePopUp} from "./ExtractNamePopUp";
 
 const SchemaTreePage = () => {
     const initTreeData = [{
@@ -32,7 +34,7 @@ const SchemaTreePage = () => {
 
     const dispatch = useDispatch();
 
-    const [treeData, setTreeData] = React.useState(initTreeData as TreeNode[]);
+    const [inputTreeData, setInputTreeData] = React.useState(initTreeData as TreeNode[]);
     const [schemaData, setSchemaData] = React.useState([] as any[]);
 
     const [selectedSchema, setSelectedSchema] = React.useState('');
@@ -41,24 +43,26 @@ const SchemaTreePage = () => {
     const [mappingData, setMappingData] = React.useState(new Map<string, Linage>());
 
     const [files, setFiles] = useState("[{}]");
-    const [displayLinage, setDisplayLinage] = useState(false);
 
+    const [displayLinage, setDisplayLinage] = useState(false);
+    const [displayMatching, setDisplayMatching] = useState(false);
+
+    const initTreeNode: TreeNode = {
+        id: 'root',
+        name: 'root',
+        path: 'root',
+        children: []
+    }
 
     useEffect(() => {
         if (files === '[{}]') {
             return;
         }
-        const initTreeNode: TreeNode = {
-            id: 'root',
-            name: 'root',
-            path: 'root',
-            children: []
-        }
         const schema = JSON.parse(files)[0];
         jsonToSchemaTree(schema, initTreeNode);
-        setTreeData(initTreeNode.children ?? []);
+        setInputTreeData(initTreeNode.children ?? []);
         // console.log(treeData, initTreeNode.children);
-    }, [files, setTreeData]);
+    }, [files, setInputTreeData]);
 
     useEffect(() => {
         if (selectedSchema)
@@ -68,6 +72,7 @@ const SchemaTreePage = () => {
             }).catch(() => {
                 dispatch(openAlert(errorAlert("Failed to get schema")));
             });
+        setMappingData(new Map());
     }, [dispatch, selectedSchema]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +116,7 @@ const SchemaTreePage = () => {
             })
             .then(data => {
                 if (data.fields) {
-                    setTreeData([fieldResolver(data)]);
+                    setInputTreeData([fieldResolver(data)]);
                     dispatch(openAlert(successAlert("File uploaded successfully.")));
                 }
             });
@@ -123,7 +128,7 @@ const SchemaTreePage = () => {
                 dispatch(openAlert(errorAlert("Failed to upload CSV")));
             })
             .then(data => {
-                setTreeData([fieldResolver(data)]);
+                setInputTreeData([fieldResolver(data)]);
                 dispatch(openAlert(successAlert("File uploaded successfully.")));
             });
     }
@@ -138,7 +143,7 @@ const SchemaTreePage = () => {
     }
 
     const getOriginalSchemaBlob = () => {
-        const processedExportedData = JSON.stringify(treeData);
+        const processedExportedData = JSON.stringify(inputTreeData);
         return saveFile(new Blob([processedExportedData], {type: 'application/json'}),
             "schema.json");
     }
@@ -163,8 +168,8 @@ const SchemaTreePage = () => {
                     <TitleWithHint title={"Your Data Schema"} article={dataSchemaHintText}/>
 
                     <SchemaTreeComponent
-                        initialTreeData={treeData}
-                        fetchData={setTreeData}
+                        initialTreeData={inputTreeData}
+                        fetchData={setInputTreeData}
                         enableAddField={true}
                     />
 
@@ -190,8 +195,11 @@ const SchemaTreePage = () => {
                                                   htmlFor='import-schema'/>
                             </Button>
                         </FormControl>
-                        <FormControl>
-                            <Button onClick={getOriginalSchemaBlob}><span className={css`display: inline-flex`}><Download/>Download</span></Button>
+                        {/*TODO: bug*/}
+                        <FormControl disabled={!inputTreeData[0]?.children}>
+                            <Button onClick={getOriginalSchemaBlob}>
+                                <ButtonWithIcon icon={<Download/>} text={"Download"}/>
+                            </Button>
                         </FormControl>
                     </div>
 
@@ -210,7 +218,7 @@ const SchemaTreePage = () => {
                     <div className={schemaMappingStyle}>
                         <SchemaTreeComponent
                             initialTreeData={schemaData}
-                            linkedTreeData={treeData}
+                            linkedTreeData={inputTreeData}
                             enableAddField={false}
                             enableLinkField={true}
                             linageMap={mappingData}
@@ -218,19 +226,23 @@ const SchemaTreePage = () => {
                         />
                     </div>
 
-                    <DataPopup
-                    data={<MappingRule data={mappingData}/>}
-                    open={displayLinage}
-                    setOpen={setDisplayLinage}/>
+                    <DataPopup data={<MappingRule data={mappingData}/>} open={displayLinage} setOpen={setDisplayLinage}/>
+                    <DataPopup data={<ExtractNamePopUp originalTreeData={inputTreeData} targetTreeData={schemaData}
+                                                       onApply={data =>{
+                                                           data.forEach((k, v) => mappingData.set(v, k));
+                                                           setDisplayMatching(false);
+                                                       }}/>}
+                               open={displayMatching} setOpen={setDisplayMatching}/>
 
-                    <div className="button-group">
-                        <Button onClick={() => setDisplayLinage(true)}>Show Rule Information</Button>
+                    <div className={buttonGroupStyle}>
+                        <Button onClick={() => setDisplayMatching(true)}><ButtonWithIcon icon={<Edit/>} text={"Match"}/></Button>
+                        <Button onClick={() => setDisplayLinage(true)}><ButtonWithIcon icon={<Search/>} text={"Show"}/></Button>
                         <Button onClick={() => {
                             setMappingData(new Map<string, Linage>());
                             setSelectedMapping('');
                             dispatch(openAlert(successAlert("Mapping cleared successfully.")));
-                        }}>Clear Mapping</Button>
-                        <Button onClick={getMappingBlob}>Export Mapping</Button>
+                        }}><ButtonWithIcon icon={<Clear/>} text={"Clear"}/></Button>
+                        <Button onClick={getMappingBlob}><ButtonWithIcon icon={<Download/>} text={"Download"}/></Button>
                         <Button onClick={() => {
                             console.log("Entries", Object.fromEntries(mappingData));
                             const tempMap = new Map<string, any>();
@@ -246,7 +258,7 @@ const SchemaTreePage = () => {
                                 updateMapping(selectedMapping, Object.fromEntries(tempMap)).then(r => console.log(r));
                             }
                             dispatch(openAlert(successAlert("Mapping saved successfully.")));
-                        }}>Save Mapping</Button>
+                        }}><ButtonWithIcon icon={<Save/>} text={"Save"}/></Button>
                     </div>
                 </Paper>
             </div>
@@ -301,5 +313,11 @@ const schemaMappingStyle = css`
   padding: 0 10px 0 10px;
 `
 
+const buttonGroupStyle = css`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 10px 25% 10px;
+`
 
 export default SchemaTreePage;

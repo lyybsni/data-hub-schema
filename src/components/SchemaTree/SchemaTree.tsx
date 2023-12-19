@@ -1,5 +1,5 @@
 import {TreeItem, TreeView} from "@mui/x-tree-view";
-import React, {useCallback, useEffect, useMemo} from "react";
+import React, {useEffect, useMemo} from "react";
 import {ChevronRight, ExpandMore} from "@mui/icons-material";
 import AddFieldModal from "./modals/AddFieldModal";
 import LinkFieldModal from "./modals/LinkFieldModal";
@@ -10,6 +10,9 @@ import MenuListComposition from "../Menu/NodeMenu";
 import {stringifyLinage} from "./SchemaTreeFormatter";
 import {css} from "@emotion/css";
 import {ConfirmDataPopup} from "../Menu/DataPopup";
+import {useDispatch} from "react-redux";
+import {successAlert} from "../../utils/Request";
+import {openAlert} from "../../redux/AlertSlice";
 
 const SchemaTreeComponent = (props: {
     initialTreeData?: TreeNode[],
@@ -22,12 +25,13 @@ const SchemaTreeComponent = (props: {
     enableAddField?: boolean,
     enableLinkField?: boolean,
     fetchData?: (nodes: TreeNode[]) => void,
-    setLinkSource?: (nodeId: string, linkedPath: string) => void,
 
     exportData?: (data: Map<string, Linage>) => void,
     linageMap?: Map<string, Linage>,
 }) => {
     // a container with a tree view of the schema
+
+    const dispatch = useDispatch();
 
     const [originalSchemaNode, setOriginalSchemaNode] = React.useState({} as TreeNode);
     const [addFieldModalOpen, setAddFieldModalOpen] = React.useState(false);
@@ -83,21 +87,17 @@ const SchemaTreeComponent = (props: {
         return result.length > 0 ? result[0] : null;
     }
 
-    const handleDeleteLink = useCallback((path: string) => {
-        linageMap.delete(path);
-        props.exportData?.(linageMap);
-    }, [linageMap, props]);
-    
     // TODO: fix the linking problem
     useEffect(() => {
         if (props.initialTreeData) {
             setTreeData(props.initialTreeData)
         }
-    }, [props.initialTreeData, handleDeleteLink]);
+    }, [props.initialTreeData]);
 
     const handleAddField = (node: BasicNode) => {
         setAddFieldModalOpen(false);
         handleAddNode(originalSchemaNode.id, node);
+        dispatch(openAlert(successAlert("Field added successfully.")));
     }
 
     const handleDeleteNode = (nodeId: string) => {
@@ -107,6 +107,7 @@ const SchemaTreeComponent = (props: {
             setTreeData([...treeData]);
             props.fetchData?.(treeData);
         }
+        dispatch(openAlert(successAlert("Node deleted successfully.")));
     }
 
     const handleModifyNode = (nodeId: string, newValue: BasicNode) => {
@@ -150,6 +151,8 @@ const SchemaTreeComponent = (props: {
             props.fetchData?.(treeDataCopy);
         }
         setAddFieldModalOpen(false);
+
+        dispatch(openAlert(successAlert("Node modified successfully.")));
     }
 
     const handleAddNode = (parentId: string, node: BasicNode) => {
@@ -185,9 +188,16 @@ const SchemaTreeComponent = (props: {
 
         setTreeData(result);
         props.fetchData?.(result);
+
+        dispatch(openAlert(successAlert("Node added successfully.")));
     };
 
-    
+    const handleDeleteLink = (path: string) => {
+        linageMap.delete(path);
+        props.exportData?.(linageMap);
+
+        dispatch(openAlert(successAlert("Link deleted successfully.")));
+    };
 
     /*** Components ***/
     const enabled = [] as string[];

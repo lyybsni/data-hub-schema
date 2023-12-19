@@ -12,13 +12,14 @@ import {
 } from "@mui/material"
 import {css} from "@emotion/css";
 import React, {ChangeEvent} from "react";
-import {PopOver} from "../../components/Menu/PopOverText";
-import {HelpOutlineRounded} from "@mui/icons-material";
-import {Hint} from "./Hint";
+import {Celebration, Warning} from "@mui/icons-material";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 import {Linage} from "../../components/SchemaTree/TreeNode";
 import {run, trailRun} from "../../components/shared/Convert";
 import {DataPopup} from "../../components/Menu/DataPopup";
+import {TitleWithHint} from "../../components/title/Title";
+import {ButtonWithIcon} from "../../components/Menu/ButtonWithIcon";
+import {MappingRule} from "../../components/MappingRule";
 
 export const MappingExample = () => {
 
@@ -103,7 +104,7 @@ export const MappingExample = () => {
                       justify-content: space-evenly`}>
                         <FormControlLabel control={<Switch
                             value={uploadFromFile}
-                            onChange={(e, value) => {
+                            onChange={(_e, value) => {
                                 setUploadFromFile(value);
 
                                 if (!value) setUploadFileName('');
@@ -148,14 +149,11 @@ export const MappingExample = () => {
                 </div>
             </Paper>
             <Paper className={operationAreaStyle}>
-                <div className={operationsStyle}>
-                    <h3>Operations</h3>
-                    <Hint article={operationHintText}/>
-                </div>
+                <TitleWithHint title={"Operations"} article={operationHintText}/>
                 <FormControlLabel control={
                     <Switch id="on-production"
                             value={onProduction}
-                            onChange={(e, checked) => setOnProduction(checked)}/>
+                            onChange={(_e, checked) => setOnProduction(checked)}/>
                 } label={onProduction ? 'Production Mode' : 'Trail Mode'}/>
 
                 <SchemaSelection setSelectedSchema={setSelectedSchema}
@@ -174,7 +172,8 @@ export const MappingExample = () => {
                         <ListItem>You have uploaded: {uploadFileName}</ListItem> : null}
                     <ListItem><Button onClick={handleSubmit}
                                       color={onProduction ? 'warning' : 'primary'}>
-                        {onProduction ? 'GO! (On Production)' : 'Try!'}
+                        {onProduction ? <ButtonWithIcon icon={<Warning/>} text={'Go on Production'}/> :
+                            <ButtonWithIcon icon={<Celebration/>} text={'Try!'}/>}
                     </Button></ListItem>
                     <ListItem><Button disabled={!selectedSchema}
                                       onClick={() => {
@@ -184,8 +183,7 @@ export const MappingExample = () => {
                     <ListItem><Button disabled={!selectedMapping}
                                       onClick={() => {
                                           setInformationPopupOpen(true);
-                                          // TODO: toString should be abstracted
-                                          setInformation(JSON.stringify(Object.fromEntries(mappingData)));
+                                          setInformation(<MappingRule data={mappingData}/>);
                                       }}>Check Mapping Rules</Button></ListItem>
                 </List>
             </Paper>
