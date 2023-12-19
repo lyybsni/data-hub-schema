@@ -1,5 +1,5 @@
 import {Linage, TreeNode} from "./TreeNode";
-import {SchemaResolve} from "../../pages/shared/Schema";
+import {SchemaResolve} from "../shared/Schema";
 
 
 export const fieldResolver = (schemaResolve: SchemaResolve) => {

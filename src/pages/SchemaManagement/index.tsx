@@ -12,7 +12,7 @@ import {
     Select,
     Switch
 } from "@mui/material";
-import {createSchema, getSchema, getSchemaList, updateSchema} from "../shared/Schema";
+import {createSchema, getSchema, getSchemaList, updateSchema} from "../../components/shared/Schema";
 import {css} from "@emotion/css";
 import {useDispatch} from "react-redux";
 import {openAlert} from "../../redux/AlertSlice";

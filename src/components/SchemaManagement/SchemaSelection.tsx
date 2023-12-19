@@ -1,7 +1,7 @@
 import {FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch} from "@mui/material";
 import React, {useEffect} from "react";
 import {css} from "@emotion/css";
-import {getMapping, getMappingUnder, getSchemaList} from "../../pages/shared/Schema";
+import {getMapping, getMappingUnder, getSchemaList} from "../shared/Schema";
 import {Linage} from "../SchemaTree/TreeNode";
 
 export const SchemaSelection = (

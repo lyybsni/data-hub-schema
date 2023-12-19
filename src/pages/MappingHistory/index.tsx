@@ -1,6 +1,6 @@
 import {Button, Chip} from "@mui/material";
 import {DataGrid} from "@mui/x-data-grid";
-import {getHistory} from "../shared/History";
+import {getHistory} from "../../components/shared/History";
 import React, {useEffect} from "react";
 import {css} from "@emotion/css";
 import {GridColDef} from "@mui/x-data-grid/models/colDef/gridColDef";

@@ -17,7 +17,7 @@ import {HelpOutlineRounded} from "@mui/icons-material";
 import {Hint} from "./Hint";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
 import {Linage} from "../../components/SchemaTree/TreeNode";
-import {run, trailRun} from "../shared/Convert";
+import {run, trailRun} from "../../components/shared/Convert";
 import {DataPopup} from "../../components/Menu/DataPopup";
 
 export const MappingExample = () => {

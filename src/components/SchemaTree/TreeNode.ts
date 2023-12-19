@@ -22,6 +22,6 @@ export type Linage = {
     transform?: string,
     fromRegex?: string,
     toRegex?: string,
-
+    primary?: boolean,
     variables?: Map<string, string>,
 }

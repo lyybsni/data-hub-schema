@@ -1,7 +1,7 @@
 import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
-import React, {ReactElement, useEffect, useMemo, useState} from "react";
-import {Button, FormControl, FormControlLabel, Input, ListItem, Paper} from "@mui/material";
-import {fieldResolver, jsonToSchemaTree, stringifyLinage} from "../../components/SchemaTree/SchemaTreeFormatter";
+import React, {useEffect, useState} from "react";
+import {Button, FormControl, FormControlLabel, Input, Paper} from "@mui/material";
+import {fieldResolver, jsonToSchemaTree} from "../../components/SchemaTree/SchemaTreeFormatter";
 import {saveFile} from "../../utils/File"
 import {
     getSchema,
@@ -10,7 +10,7 @@ import {
     uploadCSVFile,
     uploadJSONExample,
     uploadMapping
-} from "../shared/Schema";
+} from "../../components/shared/Schema";
 import {Linage, TreeNode} from "../../components/SchemaTree/TreeNode";
 import {css} from "@emotion/css";
 import {SchemaSelection} from "../../components/SchemaManagement/SchemaSelection";
@@ -142,19 +142,6 @@ const SchemaTreePage = () => {
         return saveFile(new Blob([processedExportedData], {type: 'application/json'}),
             "schema.json");
     }
-
-    // TODO:
-    const DisplayLinage = useMemo(() => {
-        const result = [] as ReactElement[]
-        mappingData.forEach((value, key) => {
-            if (value)
-            result.push(<ListItem>
-                <div>{key}</div>
-                <div>{stringifyLinage(value)}</div>
-            </ListItem>)
-        });
-        return result;
-    }, [mappingData]);
 
     const dataSchemaHintText = [
       "You can upload sample data to retrieve the data structure. Your file name will be the root element of the tree.",

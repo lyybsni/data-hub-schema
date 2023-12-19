@@ -267,7 +267,10 @@ const SchemaTreeComponent = (props: {
                 handleClose={() => setLinkFieldModalOpen(false)}
 
                 onSubmit={(linkInfo) => {
-                    linageMap.set(originalSchemaNode.path, linkInfo);
+                    linageMap.set(originalSchemaNode.path, {
+                        ...linkInfo,
+                        primary: originalSchemaNode.isPrimary
+                    });
                     props.exportData?.(linageMap);
                 }}
             /> : <div/>}
