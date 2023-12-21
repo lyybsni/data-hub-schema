@@ -10,6 +10,7 @@ import {History} from "./pages/MappingHistory";
 import {UserManagement} from './pages/UserManagement';
 import {useDispatch, useSelector} from "react-redux";
 import {closeAlert} from "./redux/AlertSlice";
+import {UserGuide} from "./pages/UserGuide";
 
 function App() {
     const router = createBrowserRouter([
@@ -35,6 +36,10 @@ function App() {
         {
             path: "/user",
             element: <UserManagement/>
+        },
+        {
+            path: "/guide",
+            element: <UserGuide/>
         }
     ]);
 
@@ -43,6 +48,19 @@ function App() {
     const handleAlertClose = () => {
         dispatch(closeAlert());
     }
+
+    const location = window.location.href;
+
+    const locationMap = [
+        ['/guide', 'User Guide'],
+        ['/schema', 'Schema Management'],
+        ['/mapping', 'Schema Mapping'],
+        ['/example', 'Mapping Trials'],
+        ['/history', 'Logs and Histories'],
+        ['/user', 'Account (Mock User 3)'],
+    ];
+
+    console.log(location.includes('/guide'));
 
     return (
         <div className="App">
@@ -59,11 +77,10 @@ function App() {
             </Snackbar>
 
             <Box id='nav-bar'>
-                <a href='/schema'>Schema Management</a>
-                <a href='/mapping'>Schema Mapping</a>
-                <a href='/example'>Mapping Trials</a>
-                <a href='/history'>Logs and Histories</a>
-                <a href='/user'>Account (Mock User 3)</a>
+                {locationMap.map(item => {
+                    return <a href={item[0]}
+                              className={location.includes(item[0]) ? selectedStyle : linkStyle}>{item[1]}</a>
+                })}
             </Box>
 
             <div className={mainContainerStyle}>
@@ -84,6 +101,17 @@ const mainContainerStyle = css`
   min-height: calc(100vh - 105px);
   grid-auto-flow: column;
   padding-top: 30px;
+`;
+
+const selectedStyle = css`
+  color: beige;
+  text-decoration: none;
+  font-weight: bold;
+`;
+
+const linkStyle = css`
+  color: white;
+  text-decoration: none;
 `;
 
 export default App;

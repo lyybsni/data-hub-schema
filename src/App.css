@@ -36,11 +36,6 @@
   background: rgba(180, 30, 30, 0.7);
 }
 
-#nav-bar a {
-  color: white;
-  text-decoration: none;
-}
-
 #footer {
   background: rgba(180, 30, 30, 0.7);
   min-height: 15px;

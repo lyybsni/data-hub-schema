@@ -19,7 +19,7 @@ import {useDispatch} from "react-redux";
 import {errorAlert, successAlert} from "../../utils/Request";
 import {openAlert} from "../../redux/AlertSlice";
 import {TitleWithHint} from "../../components/title/Title";
-import {Clear, Download, Edit, Save, Search, Upload} from "@mui/icons-material";
+import {Clear, Download, PublishedWithChanges, Save, Search, Upload} from "@mui/icons-material";
 import {MappingRule} from "../../components/MappingRule";
 import {ButtonWithIcon} from "../../components/Menu/ButtonWithIcon";
 import {ExtractNamePopUp} from "./ExtractNamePopUp";
@@ -235,7 +235,7 @@ const SchemaTreePage = () => {
                                open={displayMatching} setOpen={setDisplayMatching}/>
 
                     <div className={buttonGroupStyle}>
-                        <Button onClick={() => setDisplayMatching(true)}><ButtonWithIcon icon={<Edit/>} text={"Match"}/></Button>
+                        <Button onClick={() => setDisplayMatching(true)}><ButtonWithIcon icon={<PublishedWithChanges/>} text={"Match"}/></Button>
                         <Button onClick={() => setDisplayLinage(true)}><ButtonWithIcon icon={<Search/>} text={"Show"}/></Button>
                         <Button onClick={() => {
                             setMappingData(new Map<string, Linage>());
