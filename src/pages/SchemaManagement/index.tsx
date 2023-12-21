@@ -18,6 +18,8 @@ import {useDispatch} from "react-redux";
 import {openAlert} from "../../redux/AlertSlice";
 import {errorAlert, successAlert} from "../../utils/Request";
 import {TitleWithHint} from "../../components/title/Title";
+import {ButtonWithIcon} from "../../components/Menu/ButtonWithIcon";
+import {Clear, Save, Search} from "@mui/icons-material";
 
 const CreateSchema = (props: {
     selectedSchema: string,
@@ -126,7 +128,7 @@ export const SchemaManagementPage = () => {
                 />
             </Paper>
 
-            <Paper className={css`min-width: calc(70% - 300px);`}>
+            <Paper className={css`min-width: calc(70% - 180px);`}>
                 <TitleWithHint title={"Schema Playground"} article={schemaPlaygroundHintText}/>
                 {(createSchemaMode || selectedSchema) ?
                     <SchemaTreeComponent
@@ -136,7 +138,7 @@ export const SchemaManagementPage = () => {
                     /> : <span>No schema selected currently.</span>}
             </Paper>
 
-            <Paper className={css`min-width: 280px`}>
+            <Paper className={css`min-width: 160px`}>
                 <h3>Functions</h3>
                 <MenuList>
                     <MenuItem><Button onClick={() => {
@@ -145,9 +147,10 @@ export const SchemaManagementPage = () => {
                         } else {
                             setTreeData(savedSchema);
                         }
-                    }}>Reset Schema</Button></MenuItem>
-                    <MenuItem><Button onClick={handleSubmitSchema}>Save Schema</Button></MenuItem>
-                    <MenuItem><Button onClick={handleSubmitSchema}>View Information</Button></MenuItem>
+                    }}><ButtonWithIcon icon={<Clear/>} text={"Clear"}/></Button></MenuItem>
+                    <MenuItem><Button onClick={handleSubmitSchema}>
+                        <ButtonWithIcon icon={<Save/>} text={"Save"}/></Button></MenuItem>
+                    <MenuItem><Button onClick={handleSubmitSchema}><ButtonWithIcon icon={<Search/>} text={"View"}/></Button></MenuItem>
                 </MenuList>
             </Paper>
         </div>

@@ -1,76 +1,80 @@
-import {Chip, MenuItem, MenuList, Paper, Table, TableBody, TableCell, TableHead, TableRow} from "@mui/material";
-import React from "react";
+import {Button, Checkbox, MenuItem, MenuList, Paper} from "@mui/material";
+import React, {useEffect} from "react";
 import {css} from "@emotion/css";
+import {getProjects, getUsers, Project, User} from "../../components/shared/Users";
+import {DataGrid} from "@mui/x-data-grid";
+import {GridColDef} from "@mui/x-data-grid/models/colDef/gridColDef";
+import {CheckBoxOutlineBlank, CheckBoxOutlined} from "@mui/icons-material";
 
-const RoleManagement = () => {
+const RoleManagement = (
+    props: {
+        data: User[]
+    }
+) => {
+
+    const columns: GridColDef[] = [
+        {field: 'username', headerName: 'User Name', width: 200},
+        {field: 'role', headerName: 'User Type', width: 200,
+        valueFormatter: (params) => {
+            return params.value === 'END_USER' ? 'End User' : params.value === 'ADMIN' ? 'Admin' : 'Super Admin';
+        }
+        },
+        {field: 'privilegeType', headerName: 'Privileges', width: 200,
+        valueFormatter: (params) => {
+            return params.value === 'READ' ? 'Read Only' : 'Read and Write';
+        }
+        },
+    ]
+
     return <div>
-        <Table>
-            <TableHead>
-                <TableRow className={css`th {font-weight: bold}`}>
-                    <TableCell>Role Name</TableCell>
-                    <TableCell>Role Type</TableCell>
-                    <TableCell>Privileges</TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                <TableRow>
-                    <TableCell>Mock User 1</TableCell>
-                    <TableCell>Manager</TableCell>
-                    <TableCell><Chip label={'schema'}/><Chip label={'mapping'}/></TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Mock User 2</TableCell>
-                    <TableCell>User</TableCell>
-                    <TableCell><Chip label={'mapping'}/></TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Mock User 3</TableCell>
-                    <TableCell>Super Manager</TableCell>
-                    <TableCell><Chip label={'user'}/><Chip label={'schema'}/><Chip label={'mapping'}/></TableCell>
-                </TableRow>
-            </TableBody>
-        </Table>
-    </div>
+        <div className={css`text-align: left`}>
+            <span><Button>Create New User</Button></span>
+        </div>
+        <DataGrid columns={columns} rows={props.data}/>
+    </div>;
 }
 
-const ProjectManagement = () => {
+const ProjectManagement = (
+    props: {
+        data: Project[]
+    }
+) => {
+
+    const columns: GridColDef[] = [
+        {field: 'name', headerName: 'Project Name', width: 200},
+        {field: 'contactPerson', headerName: 'Contact Person', width: 200},
+        {field: 'clientId', headerName: 'Client ID', width: 200},
+        {field: 'whiteList', headerName: 'White List', width: 200,
+            renderCell: (params) => {
+            return params.row.whiteList ? <CheckBoxOutlined/> : <CheckBoxOutlineBlank/>;
+            }
+        },
+        {field: 'specifiedSchemas', headerName: 'Schema List', width: 200},
+    ];
+
     return <div>
-        <Table>
-            <TableHead>
-                <TableRow className={css`th {font-weight: bold}`}>
-                    <TableCell>Project</TableCell>
-                    <TableCell>Contact Person</TableCell>
-                    <TableCell>Client ID</TableCell>
-                    <TableCell>Schema List</TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                <TableRow>
-                    <TableCell>e-Admission Service</TableCell>
-                    <TableCell>Mrs. Cheng</TableCell>
-                    <TableCell>1001</TableCell>
-                    <TableCell><Chip label='applicant'/><Chip label='supervisor'/></TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Applicant Visualization Service</TableCell>
-                    <TableCell>Mr. Li</TableCell>
-                    <TableCell>1004</TableCell>
-                    <TableCell><Chip label='applicant'/></TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell>Academic Regulation Service</TableCell>
-                    <TableCell>Mrs. Chan</TableCell>
-                    <TableCell>1017</TableCell>
-                    <TableCell><Chip label='applicant'/><Chip label='supervisor'/></TableCell>
-                </TableRow>
-            </TableBody>
-        </Table>
+        <div className={css`text-align: left`}>
+            <span><Button>Create New Project</Button></span>
+        </div>
+        <DataGrid columns={columns} rows={props.data}/>
     </div>
 }
 
 export const UserManagement = () => {
 
     const [currentSelection, setCurrentSelection] = React.useState('' as string);
+
+    const [userList, setUserList] = React.useState([] as User[]);
+    const [projectList, setProjectList] = React.useState([] as Project[]);
+
+    useEffect(() => {
+        getUsers().then((res) => {
+            setUserList(res);
+        });
+        getProjects().then((res) => {
+            setProjectList(res);
+        });
+    }, []);
 
     return <div className={userManagementStyle}>
         <Paper className={menuListStyle}>
@@ -81,7 +85,7 @@ export const UserManagement = () => {
             </MenuList>
         </Paper>
         <Paper className={contentStyle}>
-            {currentSelection === 'role' ? <RoleManagement/> : <ProjectManagement/>}
+            {currentSelection === 'role' ? <RoleManagement data={userList}/> : <ProjectManagement data={projectList}/>}
         </Paper>
     </div>;
 }

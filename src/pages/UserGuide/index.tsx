@@ -87,6 +87,14 @@ const articleStyle = css`
     }
   }
   
+  p.img {
+    text-align: center;
+    img {
+      max-width: 85%;
+      margin: auto;
+    }
+  }
+  
   table {
     border-collapse: collapse;
     border-top: 2px solid #ccc;

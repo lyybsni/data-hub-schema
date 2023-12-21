@@ -99,12 +99,16 @@ export const apiCallGuide = () => {
             </tr>
             </tbody>
         </table>
-        <p><b>Through Message</b></p>
+        <p><b>Through Message (MQTT v3.1.1)</b></p>
+        <p>The service also listens to the message sending to the server. Every message piece is expected to contain (at least one) complete entity information. Under this category, streaming is available.</p>
         <p>TBD.</p>
         <p><b>Status Check</b></p>
         <p>TBD.</p>
         <hr/>
         <h4>Data Export</h4>
+        <p><b>Expose Meta-data</b></p>
+        <p><b>Dump From Data-hub</b></p>
+        <p><b>Data Aggregation through SparkQL</b></p>
         <p>TBD.</p>
         <hr/>
         <h4>Miscellaneous</h4>

@@ -10,6 +10,7 @@ export const schemaManagementGuide = () => {
                 To create a schema, ensure the "Create New Schema" switch is on. Afterwards, the "Schema Playground" will
                 display a root node to manipulate.
             </p>
+            {/*<p className='img'><img src='/img/sm-1.png' alt='Create New Schema'/></p>*/}
             <p><b>Step 2: Create a schema. </b></p>
             <p>
                 Nodes can have operations including: add a child node, modify the current node, and delete the node with children.
