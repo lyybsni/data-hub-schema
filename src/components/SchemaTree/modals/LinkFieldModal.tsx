@@ -1,9 +1,9 @@
-import {Button, FormControl, MenuItem, Modal, Select, TextField} from "@mui/material";
-import React, {ChangeEvent, useMemo} from "react";
+import { Button, FormControl, MenuItem, Modal, Select, TextField } from "@mui/material";
+import React, { ChangeEvent, useMemo, useState } from "react";
 import SchemaTreeComponent from "../SchemaTree";
-import {Linage, TreeNode} from "../TreeNode";
-import {modalStyle} from "../../shared/ModalStyle";
-import {css} from "@emotion/css";
+import { Linage, TreeNode } from "../TreeNode";
+import { modalStyle } from "../../shared/ModalStyle";
+import { css } from "@emotion/css";
 
 const LinkFieldModal = (props: {
     open: boolean,
@@ -35,7 +35,7 @@ const LinkFieldModal = (props: {
             setValue(e.target.value);
             props.onChange?.(e);
         }
-        
+
         const getValue = () => {
             if (props.mapKey) {
                 return rootMap.get(props.mapKey);
@@ -51,40 +51,41 @@ const LinkFieldModal = (props: {
         }
         }>
             <label>{props.labelText}</label>
-            <TextField fullWidth value={value} onChange={handleChange}/>
+            <TextField fullWidth value={value} onChange={handleChange} />
         </FormControl>
     }
 
     const InheritPanel = () => {
         return (<div>
-            <Panel labelText={'Direct Inherit'} mapKey='inherit'/>
+            <Panel labelText={'Direct Inherit'} mapKey='inherit' />
         </div>)
     }
 
-    const ExpressionPanel = (props: {
-        expression: string
-    }) => {
+    const ExpressionPanel = () => {
+        const [expression, setExpression] = useState(rootMap.get('expression') ?? '');
 
-        const expression = props.expression;
-
-        const expressionList = useMemo(() => {
-            const match = Array.from(expression.matchAll(/(?<=\${)\d+(?=})/g));
-            return match.map(m => {
-                return <Panel labelText={m.toString()} mapKey={m.toString()}/>
-            });
-        }, [expression]);
+        const match = Array.from(expression.matchAll(/(?<=\${)\d+(?=})/g));
+        const expressionList = useMemo(() => match.map(m => {
+            return <Panel key={m.toString()} labelText={m.toString()} mapKey={m.toString()} />
+        }), [expression]);
 
         return <div>
-            <Panel labelText={'Expression'} mapKey={'expression'} input={true}/>
+            <FormControl className='field' >
+                <label>Expression</label>
+                <TextField fullWidth value={expression} onChange={e => {
+                    setExpression(e.target.value);
+                    rootMap.set('expression', e.target.value);
+                }} />
+            </FormControl>
             {expressionList}
         </div>
     }
 
     const RegexPanel = () => {
         return <div>
-            <Panel labelText={'Field'} mapKey={'regex'}/>
-            <Panel labelText={'From Regex'} mapKey={'fromRegex'} input={true}/>
-            <Panel labelText={'To Regex'} mapKey={'toRegex'} input={true}/>
+            <Panel labelText={'Field'} mapKey={'regex'} />
+            <Panel labelText={'From Regex'} mapKey={'fromRegex'} input={true} />
+            <Panel labelText={'To Regex'} mapKey={'toRegex'} input={true} />
         </div>
     }
 
@@ -101,9 +102,9 @@ const LinkFieldModal = (props: {
     }
 
     const showingPanelMap = new Map<string, React.ReactNode>([
-        ['inherit', <InheritPanel/>],
-        ['expression', <ExpressionPanel expression={rootMap.get('expression') as string ?? ''}/>],
-        ['regex', <RegexPanel/>
+        ['inherit', <InheritPanel />],
+        ['expression', <ExpressionPanel />],
+        ['regex', <RegexPanel />
         ],
     ]);
 
@@ -169,7 +170,7 @@ const LinkFieldModal = (props: {
     }
 
     return (
-        <Modal children={container} open={props.open} onClose={handleClose}/>
+        <Modal children={container} open={props.open} onClose={handleClose} />
     )
 }
 

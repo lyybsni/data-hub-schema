@@ -29,7 +29,7 @@ const SchemaTreePage = () => {
         id: '1',
         name: 'InputRoot',
         children: [],
-        path: 'root'
+        path: 'InputRoot'
     } as TreeNode];
 
     const dispatch = useDispatch();
@@ -82,7 +82,6 @@ const SchemaTreePage = () => {
         const fileReader = new FileReader();
         fileReader.readAsText(e.target.files[0], "UTF-8");
         fileReader.onload = e => {
-            // console.log("e.target.result", e.target?.result);
             setFiles(e.target?.result as string);
         };
     };
@@ -268,7 +267,7 @@ const SchemaTreePage = () => {
 const originalSchemaGroupStyle = css`
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: center;
   justify-items: center;
   min-height: 50px;
   
@@ -316,8 +315,9 @@ const schemaMappingStyle = css`
 const buttonGroupStyle = css`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  margin: 10px 25% 10px;
+  justify-content: center;
+  // margin: 10px 25% 10px;
+  padding: 10px 0 10px 0;
 `
 
 export default SchemaTreePage;

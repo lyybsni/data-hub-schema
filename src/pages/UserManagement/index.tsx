@@ -1,4 +1,4 @@
-import {Button, Checkbox, MenuItem, MenuList, Paper} from "@mui/material";
+import {Button, MenuItem, MenuList, Paper} from "@mui/material";
 import React, {useEffect} from "react";
 import {css} from "@emotion/css";
 import {getProjects, getUsers, Project, User} from "../../components/shared/Users";
