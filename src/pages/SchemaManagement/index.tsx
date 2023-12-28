@@ -1,4 +1,4 @@
-import SchemaTreeComponent from "../../components/SchemaTree/SchemaTree";
+import SchemaTreeComponent, { findPrimary } from "../../components/SchemaTree/SchemaTree";
 import React, {useEffect} from "react";
 import {TreeNode} from "../../components/SchemaTree/TreeNode";
 import {
@@ -29,9 +29,8 @@ const CreateSchema = (props: {
 }) => {
     return (
         <FormControl id='schema-page-selection-group' disabled={!props.display} sx={{display: 'flex'}}>
-            <InputLabel htmlFor='schema'>Current Schema</InputLabel>
-            <Select id="schema"
-                    fullWidth
+            <InputLabel>Current Schema</InputLabel>
+            <Select fullWidth
                     value={props.selectedSchema}
                     onChange={(e) => props.setSelectedSchema(e.target.value as string)}>{props.schemaList}</Select>
         </FormControl>
@@ -56,7 +55,6 @@ export const SchemaManagementPage = () => {
 
     useEffect(() => {
         getSchemaList().then((res) => {
-            console.log(res);
             return res.map((item) => {
                 return (<MenuItem value={item.id} key={item.id}>
                     {item.schema.name ?? item.id}
@@ -80,14 +78,16 @@ export const SchemaManagementPage = () => {
     }, [dispatch, selectedSchema]);
 
     const handleSubmitSchema = () => {
+        if (findPrimary(treeData).length === 0) {
+            // TODO: add a warning panel
+            console.info("there is no id");
+        }
+
         if (selectedSchema) {
             updateSchema(selectedSchema, JSON.stringify(treeData))
                 .then(() => {
                     dispatch(openAlert(successAlert("Schema updated successfully.")));
                 })
-                // .catch(() => {
-                //     // dispatch(openAlert(errorAlert("Update schema failed.")));
-                // });
         } else {
             createSchema(JSON.stringify(treeData))
                 .then(() => {

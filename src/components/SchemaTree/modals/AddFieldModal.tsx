@@ -114,8 +114,6 @@ const AddFieldModal = (props: {
         props.handleClose();
     }
 
-    console.log(props);
-
     return (
         <Modal children={container} open={props.open} onClose={handleClose}/>
     )

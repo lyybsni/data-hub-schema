@@ -38,7 +38,7 @@ export const post = async (url: string, data: any, contentType?: string) => {
     return await fetch(baseUrl + url, {
         method: 'POST',
         headers: {
-            ...(contentType ? {} : {'Content-Type': 'application/json'}),
+            ...(contentType ? {} : { 'Content-Type': 'application/json' }),
         },
         body: contentType ? data : JSON.stringify(data)
     }).then(res => res.json());
@@ -51,5 +51,5 @@ export const put = async (url: string, data: any) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
-    }).then(res => res.json());
+    });
 }

@@ -3,9 +3,6 @@ import {SchemaResolve} from "../shared/Schema";
 
 
 export const fieldResolver = (schemaResolve: SchemaResolve) => {
-
-    console.log(schemaResolve);
-
     const root = {
         id: schemaResolve.name,
         name: schemaResolve.name,
@@ -54,9 +51,7 @@ export const fieldResolver = (schemaResolve: SchemaResolve) => {
     return root;
 }
 
-
 export const stringifyLinage = (info?: Linage) => {
-    // console.log(info);
     if (info?.inherit != null) {
         return ` ${info?.inherit}`
     } else if (info?.expression != null) {
@@ -64,8 +59,6 @@ export const stringifyLinage = (info?: Linage) => {
         let copy = info.expression;
         Array.from(match).forEach((item) => {
             copy = copy.replaceAll(`${item[0]}`, info?.variables?.get(item[0] as string) ?? '');
-
-            console.log(item)
         });
         return ` ${copy}`
     } else if (info?.transform != null) {

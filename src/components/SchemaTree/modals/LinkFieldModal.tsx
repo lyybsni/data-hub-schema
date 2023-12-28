@@ -148,7 +148,6 @@ const LinkFieldModal = (props: {
                     variables.set(`\${${key}}`, value);
                 }
             });
-            console.log(variables);
 
             props.onSubmit?.({
                 type: selection,

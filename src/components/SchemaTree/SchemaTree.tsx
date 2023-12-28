@@ -1,18 +1,17 @@
-import {TreeItem, TreeView} from "@mui/x-tree-view";
-import React, {useEffect, useMemo} from "react";
-import {ChevronRight, ExpandMore} from "@mui/icons-material";
+import { TreeItem, TreeView } from "@mui/x-tree-view";
+import React, { useEffect, useMemo } from "react";
+import { ChevronRight, ExpandMore } from "@mui/icons-material";
 import AddFieldModal from "./modals/AddFieldModal";
 import LinkFieldModal from "./modals/LinkFieldModal";
 import '../../pages/Mapping/SchemaTree.css';
-import {BasicNode, Linage, TreeNode} from "./TreeNode";
-import {DisplayNode} from "./DisplayNode";
+import { BasicNode, Linage, TreeNode } from "./TreeNode";
+import { DisplayNode } from "./DisplayNode";
 import MenuListComposition from "../Menu/NodeMenu";
-import {stringifyLinage} from "./SchemaTreeFormatter";
-import {css} from "@emotion/css";
-import {ConfirmDataPopup} from "../Menu/DataPopup";
-import {useDispatch} from "react-redux";
-import {successAlert} from "../../utils/Request";
-import {openAlert} from "../../redux/AlertSlice";
+import { stringifyLinage } from "./SchemaTreeFormatter";
+import { css } from "@emotion/css";
+import { useDispatch } from "react-redux";
+import { successAlert } from "../../utils/Request";
+import { openAlert } from "../../redux/AlertSlice";
 
 const SchemaTreeComponent = (props: {
     initialTreeData?: TreeNode[],
@@ -38,7 +37,7 @@ const SchemaTreeComponent = (props: {
     const [linkFieldModalOpen, setLinkFieldModalOpen] = React.useState(false);
     const [onModify, setOnModify] = React.useState(false);
     const [treeData, setTreeData] = React.useState<TreeNode[]>(props.initialTreeData ?? [
-        {id: '1', name: 'InputRoot', children: [], path: 'root'} as TreeNode,
+        { id: '1', name: 'InputRoot', children: [], path: 'root' } as TreeNode,
     ]);
 
     const linageMap = useMemo(() => props.linageMap ?? new Map<string, Linage>(), [props.linageMap])
@@ -76,7 +75,6 @@ const SchemaTreeComponent = (props: {
 
         while (temp.length !== 0) {
             const result = temp.filter(node => node.children?.find(child => child.id === targetId));
-            console.log(temp, result);
             if (result.length > 0 && result[0] !== undefined) {
                 return result[0];
             }
@@ -143,7 +141,6 @@ const SchemaTreeComponent = (props: {
                 targetPaths = newValue.name;
             }
             modifyRoot(targetNode, targetNode.path, targetPaths);
-            console.log(targetPaths);
 
             setTreeData(treeDataCopy);
             props.fetchData?.(treeDataCopy);
@@ -167,15 +164,15 @@ const SchemaTreeComponent = (props: {
                         ...child,
                         type: undefined,
                         children: [...(child.children || []),
-                            {
-                                ...newNode,
-                                // TODO: fix path generation in the end
-                                path: child.path + '.' + node.name,
-                            }
+                        {
+                            ...newNode,
+                            // TODO: fix path generation in the end
+                            path: child.path + '.' + node.name,
+                        }
                         ] as TreeNode[]
                     };
                 } else if (child.children) {
-                    return {...child, children: addNode(child.children)};
+                    return { ...child, children: addNode(child.children) };
                 } else {
                     return child;
                 }
@@ -209,10 +206,6 @@ const SchemaTreeComponent = (props: {
         enabled.push('delete-link')
     }
 
-    // TODO: there is bug in infinite loop
-    const [confirmDelete, setConfirmDelete] = React.useState(false);
-    const [handleNodeDelete, setHandleNodeDelete] = React.useState<(() => void) | undefined>(undefined);
-
     const renderTree = (node: TreeNode) => (
         <TreeItem
             key={node.id}
@@ -225,34 +218,33 @@ const SchemaTreeComponent = (props: {
                       font-style: italic;
                       font-size: 0.5em;
                     `}>{linageMap.has(node.path) && linageMap.get(node.path) ? stringifyLinage(linageMap.get(node.path)) : ''}</span>
-                }/>
-                {/*{LinkBoxComponent(JSON.stringify(linageMap.get(node.id)), node.children ? node.children.length > 0 : false)}*/}
+                } />
+
                 <span hidden={props.enableLinkField && !node.isArray && (!!node.children?.length) && (node.children.length > 0)}>
                     <MenuListComposition enabled={
                         node.id === treeData[0].id ?
-                        enabled.filter(val => val !== 'delete') : enabled
+                            enabled.filter(val => val !== 'delete') : enabled
                     } color={linageMap.has(node.path) ? 'secondary' : 'primary'}
-                                                                                           onAdd={() => {
-                                               setAddFieldModalOpen(true);
-                                               setOriginalSchemaNode(node);
-                                               setOnModify(false);
-                                           }}
-                                                                                           onModify={() => {
-                                               setAddFieldModalOpen(true);
-                                               setOriginalSchemaNode(node);
-                                               setOnModify(true);
-                                           }}
-                                                                                           onLink={() => {
-                                               setLinkFieldModalOpen(true);
-                                           }}
-                                                                                           onDelete={() => {
-                                               // TODO: add a confirmation pop up
-                                               handleDeleteNode(node.id);
-                                           }}
-                                         onDeleteLink={() => {
-                                             handleDeleteLink(node.path);
-                                         }}
-                /></span>
+                        onAdd={() => {
+                            setAddFieldModalOpen(true);
+                            setOriginalSchemaNode(node);
+                            setOnModify(false);
+                        }}
+                        onModify={() => {
+                            setAddFieldModalOpen(true);
+                            setOriginalSchemaNode(node);
+                            setOnModify(true);
+                        }}
+                        onLink={() => {
+                            setLinkFieldModalOpen(true);
+                        }}
+                        onDelete={() => {
+                            handleDeleteNode(node.id);
+                        }}
+                        onDeleteLink={() => {
+                            handleDeleteLink(node.path);
+                        }}
+                    /></span>
             </div>}>
             {Array.isArray(node.children) ? node.children.map((node) => renderTree(node)) : null}
         </TreeItem>
@@ -268,7 +260,7 @@ const SchemaTreeComponent = (props: {
                 onAdd={handleAddField}
                 initialValues={originalSchemaNode ?? null}
                 onModify={onModify ? (v) => handleModifyNode(originalSchemaNode.id, v) : undefined}
-            /> : <div/>}
+            /> : <div />}
             {linkFieldModalOpen ? <LinkFieldModal
                 treeData={props.linkedTreeData ?? []}
                 open={linkFieldModalOpen}
@@ -281,8 +273,7 @@ const SchemaTreeComponent = (props: {
                     });
                     props.exportData?.(linageMap);
                 }}
-            /> : <div/>}
-            <ConfirmDataPopup data={"Are you sure to delete this node with its children?"} open={confirmDelete} setOpen={setConfirmDelete} onDelete={handleNodeDelete}/>
+            /> : <div />}
 
             {/* A block for original schema */}
             <div>
@@ -293,17 +284,26 @@ const SchemaTreeComponent = (props: {
                         setOriginalSchemaNode(node);
                         props.setSelectedNode?.(id);
                         props.setSelectedPath?.(node.path);
-
-                        console.log("Selected node", node)
                     }
                     }
-                    defaultCollapseIcon={<ExpandMore/>}
-                    defaultExpandIcon={<ChevronRight/>}>
+                    defaultCollapseIcon={<ExpandMore />}
+                    defaultExpandIcon={<ChevronRight />}>
                     {treeData.map((node) => renderTree(node))}
                 </TreeView>
             </div>
         </div>
     )
+}
+
+export const findPrimary = (treeNodes: TreeNode[]): TreeNode[] => {
+    var temp = [...treeNodes];
+    let result: TreeNode[] = [];
+
+    while (temp.length !== 0) {
+        result = [...result, ...temp.filter(node => node.isPrimary)];
+        temp = temp.flatMap(node => node.children ?? []);
+    }
+    return result;
 }
 
 export default SchemaTreeComponent;

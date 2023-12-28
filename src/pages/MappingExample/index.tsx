@@ -73,7 +73,6 @@ export const MappingExample = () => {
     }
 
     const uploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target);
         if (!e.target || !e.target.files) {
             return false;
         }

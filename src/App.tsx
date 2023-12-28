@@ -60,8 +60,6 @@ function App() {
         ['/user', 'Account (Mock User 3)'],
     ];
 
-    console.log(location.includes('/guide'));
-
     return (
         <div className="App">
             <header className="App-header">
@@ -79,6 +77,7 @@ function App() {
             <Box id='nav-bar'>
                 {locationMap.map(item => {
                     return <a href={item[0]}
+                                key={item[0]}
                               className={location.includes(item[0]) ? selectedStyle : linkStyle}>{item[1]}</a>
                 })}
             </Box>

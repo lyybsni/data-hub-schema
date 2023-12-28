@@ -26,7 +26,6 @@ export const SchemaSelection = (
     useEffect(() => {
         // load the data from back end
         getSchemaList().then((res) => {
-            console.log("HERE", res);
             return res.map((item) => {
                 return (<MenuItem value={item.id} key={item.id}>
                     {item.schema.name ?? item.id}
@@ -43,7 +42,6 @@ export const SchemaSelection = (
         if (selectedSchema)
             getMappingUnder(selectedSchema).then((res) => {
                 return res.map((item) => {
-                    console.log(item)
                     return (<MenuItem value={item.id} key={item.id}>
                         {item.id}
                     </MenuItem>)

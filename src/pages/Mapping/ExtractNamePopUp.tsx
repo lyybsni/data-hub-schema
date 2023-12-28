@@ -67,7 +67,6 @@ export const ExtractNamePopUp = (
         const originalMap = new Map<string, string[]>();
         processTreeData(props.originalTreeData[0], originalMap);
         extractName(props.targetTreeData[0], originalMap);
-        console.log("RESULT", result);
         return result;
     }, [props.originalTreeData, props.targetTreeData])
 
