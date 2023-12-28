@@ -11,7 +11,7 @@ export const Hint = (
 ) => {
     const convert = (article: string[]) => {
         return article.map((item, idx) => {
-            return <ListItem itemID={`${idx}`} sx={{display: 'list-item'}}>{item}</ListItem>
+            return <ListItem key={idx} itemID={`${idx}`} sx={{display: 'list-item'}}>{item}</ListItem>
         })
     }
     return <PopOver baseText={<HelpOutlineRounded sx={{height: '16px', width: '16px'}}/>}

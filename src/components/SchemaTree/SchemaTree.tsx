@@ -72,19 +72,17 @@ const SchemaTreeComponent = (props: {
     }
 
     const findParent = (treeNodes: TreeNode[], targetId: string): TreeNode | null => {
-        const processNode = (node: TreeNode): TreeNode | null => {
-            if (node.children?.find((child) => child.id === targetId)) {
-                return node;
-            } else if (node.children) {
-                return findNode(node.children, targetId);
-            } else {
-                return null;
-            }
-        }
+        var temp = [...treeNodes];
 
-        const result: (TreeNode | null)[] = treeNodes.map(processNode).filter((x) => !!x);
-        console.log(result);
-        return result.length > 0 ? result[0] : null;
+        while (temp.length !== 0) {
+            const result = temp.filter(node => node.children?.find(child => child.id === targetId));
+            console.log(temp, result);
+            if (result.length > 0 && result[0] !== undefined) {
+                return result[0];
+            }
+            temp = temp.flatMap(node => node.children ?? []);
+        }
+        return null;
     }
 
     // TODO: fix the linking problem
